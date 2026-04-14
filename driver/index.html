@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChopChop Driver | Deliver with ChopChop</title>
+    <meta name="theme-color" content="#0066CC">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --blue: #0066CC;
+            --blue-dark: #0052A3;
+            --blue-light: #E8F0FE;
+            --green: #00843D;
+            --green-light: #E5F3EB;
+            --red: #E31C23;
+            --orange: #F59E0B;
+            --orange-light: #FEF3C7;
+            --white: #FFFFFF;
+            --bg: #F4F6FA;
+            --text: #1A1A2E;
+            --text-mid: #555555;
+            --text-light: #999999;
+            --border: #E0E6F0;
+            --shadow: 0 2px 12px rgba(0,0,0,0.07);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.1);
+            --radius: 14px;
+            --radius-sm: 8px;
+            --font: 'Inter', -apple-system, sans-serif;
+            --nav-h: 65px;
+            --header-h: 64px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+        /* === VIEWS === */
+        .view { display: none; min-height: 100vh; padding-bottom: calc(var(--nav-h) + 16px); }
+        .view.active { display: block; animation: fadeUp 0.25s ease; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* === HEADER === */
+        .app-header {
+            background: var(--blue);
+            height: var(--header-h);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            box-shadow: 0 2px 8px rgba(0,102,204,0.3);
+        }
+        .app-header .brand { display: flex; align-items: center; gap: 10px; }
+        .app-header .brand-icon {
+            width: 38px; height: 38px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--white); font-size: 1.1rem;
+        }
+        .app-header .brand-text h1 { color: var(--white); font-size: 1rem; font-weight: 800; line-height: 1; }
+        .app-header .brand-text span { color: rgba(255,255,255,0.75); font-size: 0.72rem; font-weight: 500; }
+        .online-toggle {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 6px 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .online-toggle:hover { background: rgba(255,255,255,0.25); }
+        .toggle-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: #4ADE80;
+            box-shadow: 0 0 0 3px rgba(74,222,128,0.3);
+            transition: all 0.3s;
+        }
+        .toggle-dot.offline { background: rgba(255,255,255,0.4); box-shadow: none; }
+        .online-toggle span { color: var(--white); font-size: 0.82rem; font-weight: 600; }
+
+        /* === BOTTOM NAV === */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: var(--white);
+            height: var(--nav-h);
+            display: flex;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+            z-index: 200;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .nav-tab {
+            flex: 1;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            border: none; background: transparent;
+            color: var(--text-light); font-size: 0.72rem; font-weight: 600;
+            cursor: pointer; transition: color 0.2s; padding: 10px 0;
+        }
+        .nav-tab i { font-size: 1.2rem; }
+        .nav-tab.active { color: var(--blue); }
+        .nav-badge {
+            position: absolute; top: 8px; right: calc(50% - 18px);
+            background: var(--red); color: var(--white);
+            font-size: 0.65rem; font-weight: 800;
+            width: 16px; height: 16px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* === PAGE HEADER === */
+        .page-top {
+            background: var(--white);
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .page-top.no-border { border-bottom: none; box-shadow: var(--shadow); margin-bottom: 4px; }
+        .back-btn {
+            width: 38px; height: 38px; border-radius: 50%;
+            background: var(--bg); border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text); font-size: 1rem;
+        }
+        .page-top h2 { font-size: 1.1rem; font-weight: 700; flex: 1; }
+        .page-top .subtitle { font-size: 0.82rem; color: var(--text-mid); font-weight: 500; }
+
+        /* === UTILITIES === */
+        .pad { padding: 16px; }
+        .section { margin-bottom: 24px; }
+        .section-label {
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 0.8px;
+            text-transform: uppercase; color: var(--text-light);
+            margin-bottom: 12px; padding: 0 16px;
+        }
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        .divider { height: 1px; background: var(--border); margin: 0 16px; }
+
+        /* === STATUS CHIPS === */
+        .chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 10px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 700;
+        }
+        .chip.available { background: var(--green-light); color: var(--green); }
+        .chip.active { background: var(--blue-light); color: var(--blue); }
+        .chip.pending { background: var(--orange-light); color: #B45309; }
+
+        /* === ORDERS LIST === */
+        .orders-header {
+            background: var(--white);
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .orders-header-top {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+        }
+        .orders-header h2 { font-size: 1.2rem; font-weight: 800; }
+        .filter-tabs {
+            display: flex; gap: 8px; overflow-x: auto;
+            scrollbar-width: none; padding-bottom: 2px;
+        }
+        .filter-tabs::-webkit-scrollbar { display: none; }
+        .filter-tab {
+            padding: 7px 14px; border-radius: 20px; border: none;
+            font-size: 0.82rem; font-weight: 600; cursor: pointer;
+            white-space: nowrap; transition: all 0.2s;
+            background: var(--bg); color: var(--text-mid);
+        }
+        .filter-tab.active { background: var(--blue); color: var(--white); }
+
+        .order-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin: 8px 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 2px solid transparent;
+        }
+        .order-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .order-card.highlighted { border-color: var(--blue); }
+
+        .order-card-header {
+            padding: 14px 16px;
+            display: flex; justify-content: space-between; align-items: flex-start;
+            border-bottom: 1px solid var(--border);
+        }
+        .order-id-row { display: flex; align-items: center; gap: 8px; }
+        .order-id-row strong { font-size: 0.95rem; font-weight: 700; }
+        .order-card-body { padding: 14px 16px; }
+        .route-line {
+            display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px;
+        }
+        .route-icons { display: flex; flex-direction: column; align-items: center; gap: 2px; padding-top: 3px; }
+        .route-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .route-dot.pickup { background: var(--blue); }
+        .route-dot.dropoff { background: var(--green); }
+        .route-line-connector { width: 2px; height: 20px; background: var(--border); }
+        .route-details { flex: 1; }
+        .route-point { margin-bottom: 10px; }
+        .route-point:last-child { margin-bottom: 0; }
+        .route-point .label { font-size: 0.7rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
+        .route-point .address { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-top: 2px; }
+        .route-point .sublabel { font-size: 0.8rem; color: var(--text-mid); margin-top: 1px; }
+
+        .order-meta {
+            display: flex; gap: 16px; padding-top: 10px;
+            border-top: 1px solid var(--border); margin-top: 4px;
+        }
+        .meta-item { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-mid); font-weight: 500; }
+        .meta-item i { color: var(--blue); }
+        .meta-item.earn i { color: var(--green); }
+        .meta-item.earn { color: var(--green); font-weight: 700; }
+
+        .order-actions { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 12px 18px; border-radius: 10px; border: none;
+            font-weight: 700; font-size: 0.9rem; cursor: pointer;
+            transition: all 0.2s; font-family: var(--font);
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-blue { background: var(--blue); color: var(--white); flex: 1; }
+        .btn-blue:hover { background: var(--blue-dark); }
+        .btn-green { background: var(--green); color: var(--white); flex: 1; }
+        .btn-green:hover { background: #006E33; }
+        .btn-outline { background: var(--bg); color: var(--text-mid); border: 1px solid var(--border); }
+        .btn-outline:hover { background: var(--border); }
+        .btn-block { width: 100%; }
+        .btn-lg { padding: 16px 24px; font-size: 1rem; border-radius: 12px; }
+        .btn-red { background: var(--red); color: var(--white); }
+
+        /* === ACTIVE DELIVERY VIEW === */
+        .delivery-map {
+            height: 260px;
+            background: #E8EFF7;
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column; gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        .delivery-map::before {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,102,204,0.06) 40px),
+                repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,102,204,0.06) 40px);
+        }
+        .map-route-svg {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+        }
+        .map-center-content { position: relative; z-index: 2; text-align: center; }
+        .map-center-content i { font-size: 2.5rem; color: var(--blue); margin-bottom: 8px; }
+        .map-center-content p { font-size: 0.85rem; color: var(--text-mid); font-weight: 600; }
+        .map-driver-pin {
+            position: absolute;
+            bottom: 50%; left: 50%;
+            transform: translate(-50%, 50%);
+            z-index: 3;
+        }
+        .driver-pin {
+            width: 44px; height: 44px;
+            background: var(--blue); border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,102,204,0.4);
+        }
+        .driver-pin i { transform: rotate(45deg); color: var(--white); font-size: 1.1rem; }
+
+        .eta-pill {
+            position: absolute; top: 12px; right: 12px; z-index: 4;
+            background: var(--white); border-radius: 20px;
+            padding: 6px 14px; box-shadow: var(--shadow-md);
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.85rem; font-weight: 700; color: var(--blue);
+        }
+
+        .pickup-steps { padding: 16px; }
+        .step-row {
+            display: flex; align-items: flex-start; gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .step-row:last-child { border-bottom: none; }
+        .step-num {
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; font-weight: 800; flex-shrink: 0;
+        }
+        .step-num.done { background: var(--green); color: var(--white); }
+        .step-num.current { background: var(--blue); color: var(--white); }
+        .step-num.upcoming { background: var(--border); color: var(--text-light); }
+        .step-info h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 2px; }
+        .step-info p { font-size: 0.82rem; color: var(--text-mid); margin: 0; }
+
+        .order-items-mini { padding: 14px 16px; }
+        .item-mini-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 0; font-size: 0.88rem;
+        }
+        .item-mini-row:not(:last-child) { border-bottom: 1px dashed var(--border); }
+        .item-mini-row .name { color: var(--text); font-weight: 500; }
+        .item-mini-row .qty { color: var(--text-mid); }
+
+        /* === EARNINGS VIEW === */
+        .earnings-hero {
+            background: linear-gradient(135deg, var(--blue) 0%, #0088FF 100%);
+            padding: 28px 20px;
+            color: var(--white);
+            text-align: center;
+        }
+        .earnings-hero .period { font-size: 0.8rem; font-weight: 600; opacity: 0.8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .earnings-hero .amount { font-size: 3rem; font-weight: 900; margin-bottom: 4px; }
+        .earnings-hero .sub { font-size: 0.9rem; opacity: 0.8; }
+        .earnings-period-tabs {
+            display: flex;
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            padding: 4px;
+            margin: 16px 0 0;
+        }
+        .ep-tab {
+            flex: 1; padding: 7px 12px; border: none; border-radius: 7px;
+            font-size: 0.82rem; font-weight: 600; cursor: pointer;
+            background: transparent; color: rgba(255,255,255,0.8);
+            font-family: var(--font); transition: all 0.2s;
+        }
+        .ep-tab.active { background: var(--white); color: var(--blue); }
+
+        .stats-row {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 12px; margin: 16px;
+        }
+        .stat-box {
+            background: var(--white); border-radius: var(--radius);
+            padding: 14px 12px; text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .stat-box .val { font-size: 1.3rem; font-weight: 800; color: var(--blue); }
+        .stat-box .lbl { font-size: 0.72rem; color: var(--text-light); font-weight: 600; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .delivery-log { margin: 0 16px; }
+        .log-item {
+            background: var(--white); border-radius: var(--radius);
+            padding: 14px 16px; margin-bottom: 10px;
+            box-shadow: var(--shadow);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .log-item .log-info .log-id { font-size: 0.85rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+        .log-item .log-info .log-time { font-size: 0.78rem; color: var(--text-light); }
+        .log-item .log-earn { font-size: 1rem; font-weight: 800; color: var(--green); }
+
+        /* === CONFIRM SCREEN === */
+        .confirm-screen {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 40px 24px; text-align: center;
+        }
+        .confirm-icon {
+            width: 90px; height: 90px; border-radius: 50%;
+            background: var(--green-light);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.8rem; color: var(--green); margin-bottom: 24px;
+        }
+        .confirm-screen h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: 12px; }
+        .confirm-screen p { color: var(--text-mid); font-size: 0.95rem; line-height: 1.6; max-width: 320px; }
+        .confirm-detail-card {
+            background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow);
+            padding: 20px; width: 100%; margin: 24px 0; text-align: left;
+        }
+        .confirm-detail-row {
+            display: flex; justify-content: space-between;
+            padding: 10px 0; border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+        .confirm-detail-row:last-child { border-bottom: none; }
+        .confirm-detail-row .key { color: var(--text-mid); font-weight: 500; }
+        .confirm-detail-row .val { font-weight: 700; color: var(--text); }
+        .confirm-detail-row .val.green { color: var(--green); }
+
+        /* === PROFILE VIEW === */
+        .profile-hero {
+            background: linear-gradient(135deg, var(--blue) 0%, #0088FF 100%);
+            padding: 32px 20px 48px;
+            text-align: center;
+        }
+        .profile-avatar {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: rgba(255,255,255,0.2); border: 3px solid rgba(255,255,255,0.4);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; color: var(--white);
+            margin: 0 auto 14px;
+        }
+        .profile-hero h2 { color: var(--white); font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; }
+        .profile-hero .rating { color: rgba(255,255,255,0.85); font-size: 0.88rem; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .rating-stars { color: #FCD34D; }
+        .profile-stats {
+            background: var(--white); margin: -20px 16px 0; border-radius: var(--radius);
+            box-shadow: var(--shadow-md); padding: 16px;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+            position: relative; z-index: 10;
+        }
+        .pstat { text-align: center; }
+        .pstat .val { font-size: 1.2rem; font-weight: 800; color: var(--blue); }
+        .pstat .lbl { font-size: 0.7rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+        .menu-list { margin: 24px 16px 0; }
+        .menu-item {
+            background: var(--white); border-radius: var(--radius-sm);
+            padding: 14px 16px; margin-bottom: 8px;
+            display: flex; align-items: center; gap: 14px;
+            box-shadow: var(--shadow); cursor: pointer; transition: background 0.15s;
+        }
+        .menu-item:hover { background: var(--blue-light); }
+        .menu-item .mi-icon {
+            width: 38px; height: 38px; border-radius: 10px;
+            background: var(--blue-light); color: var(--blue);
+            display: flex; align-items: center; justify-content: center; font-size: 1rem;
+        }
+        .menu-item .mi-text { flex: 1; }
+        .menu-item .mi-text h4 { font-size: 0.92rem; font-weight: 600; margin-bottom: 2px; }
+        .menu-item .mi-text p { font-size: 0.78rem; color: var(--text-mid); margin: 0; }
+        .menu-item .mi-arrow { color: var(--text-light); }
+
+        /* === DESKTOP === */
+        @media (min-width: 768px) {
+            .view { padding-bottom: 0; }
+            .bottom-nav { display: none; }
+            .desktop-layout { display: flex; height: calc(100vh - var(--header-h)); }
+            .desktop-sidebar {
+                width: 260px; background: var(--white); border-right: 1px solid var(--border);
+                display: flex; flex-direction: column; padding: 20px 0; overflow-y: auto;
+            }
+            .desktop-sidebar .nav-tab {
+                flex-direction: row; justify-content: flex-start; gap: 12px;
+                padding: 12px 20px; border-radius: 0; font-size: 0.9rem;
+                color: var(--text-mid);
+            }
+            .desktop-sidebar .nav-tab.active { color: var(--blue); background: var(--blue-light); border-right: 3px solid var(--blue); }
+            .desktop-main { flex: 1; overflow-y: auto; padding: 24px; }
+            .order-card { margin: 0 0 16px; }
+            .delivery-map { height: 360px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- APP HEADER -->
+<header class="app-header">
+    <div class="brand">
+        <div class="brand-icon"><i class="fa fa-motorcycle"></i></div>
+        <div class="brand-text">
+            <h1>ChopChop Driver</h1>
+            <span>by Choppies</span>
+        </div>
+    </div>
+    <div class="online-toggle" id="onlineToggle" onclick="driver.toggleOnline()">
+        <div class="toggle-dot" id="statusDot"></div>
+        <span id="statusLabel">Online</span>
+    </div>
+</header>
+
+<!-- VIEWS -->
+
+<!-- ORDERS VIEW -->
+<div class="view active" id="view-orders">
+    <div class="orders-header">
+        <div class="orders-header-top">
+            <h2>Available Orders</h2>
+            <span class="chip available"><i class="fa fa-circle" style="font-size:0.5rem;"></i> 4 Nearby</span>
+        </div>
+        <div class="filter-tabs">
+            <button class="filter-tab active">All</button>
+            <button class="filter-tab">Groceries</button>
+            <button class="filter-tab">CFC</button>
+            <button class="filter-tab">High Paying</button>
+        </div>
+    </div>
+
+    <div style="padding: 12px 0;">
+
+        <!-- Order Card 1 -->
+        <div class="order-card highlighted">
+            <div class="order-card-header">
+                <div class="order-id-row">
+                    <strong>#CHOP-3821</strong>
+                    <span class="chip available">Groceries</span>
+                </div>
+                <span class="chip active" style="background:#FEF3C7; color:#B45309;">2 min ago</span>
+            </div>
+            <div class="order-card-body">
+                <div class="route-line">
+                    <div class="route-icons">
+                        <div class="route-dot pickup"></div>
+                        <div class="route-line-connector"></div>
+                        <div class="route-dot dropoff"></div>
+                    </div>
+                    <div class="route-details">
+                        <div class="route-point">
+                            <div class="label">Pickup</div>
+                            <div class="address">Choppies Superstore, Game City</div>
+                            <div class="sublabel">Ready in ~5 min</div>
+                        </div>
+                        <div class="route-point">
+                            <div class="label">Deliver to</div>
+                            <div class="address">Plot 12, Phakalane Estate</div>
+                            <div class="sublabel">3.2 km · ~8 min drive</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="order-meta">
+                    <div class="meta-item earn"><i class="fa fa-wallet"></i> BWP 18.50</div>
+                    <div class="meta-item"><i class="fa fa-box"></i> 6 items</div>
+                    <div class="meta-item"><i class="fa fa-route"></i> 3.2 km</div>
+                </div>
+            </div>
+            <div class="order-actions">
+                <button class="btn btn-outline" onclick="driver.declineOrder()"><i class="fa fa-times"></i> Skip</button>
+                <button class="btn btn-blue" onclick="driver.acceptOrder('CHOP-3821', 'Phakalane Estate', 'BWP 18.50', 'Choppies Game City')">
+                    <i class="fa fa-check"></i> Accept Order
+                </button>
+            </div>
+        </div>
+
+        <!-- Order Card 2 -->
+        <div class="order-card">
+            <div class="order-card-header">
+                <div class="order-id-row">
+                    <strong>#CHOP-3819</strong>
+                    <span class="chip available">CFC</span>
+                </div>
+                <span style="font-size:0.78rem; color:var(--text-light); font-weight:600;">5 min ago</span>
+            </div>
+            <div class="order-card-body">
+                <div class="route-line">
+                    <div class="route-icons">
+                        <div class="route-dot pickup"></div>
+                        <div class="route-line-connector"></div>
+                        <div class="route-dot dropoff"></div>
+                    </div>
+                    <div class="route-details">
+                        <div class="route-point">
+                            <div class="label">Pickup</div>
+                            <div class="address">Choppies CFC, Molapo Crossing</div>
+                            <div class="sublabel">Ready in ~10 min</div>
+                        </div>
+                        <div class="route-point">
+                            <div class="label">Deliver to</div>
+                            <div class="address">Riverwalk Mall Area, Block 3</div>
+                            <div class="sublabel">2.1 km · ~6 min drive</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="order-meta">
+                    <div class="meta-item earn"><i class="fa fa-wallet"></i> BWP 14.00</div>
+                    <div class="meta-item"><i class="fa fa-box"></i> 2 items</div>
+                    <div class="meta-item"><i class="fa fa-route"></i> 2.1 km</div>
+                </div>
+            </div>
+            <div class="order-actions">
+                <button class="btn btn-outline"><i class="fa fa-times"></i> Skip</button>
+                <button class="btn btn-blue" onclick="driver.acceptOrder('CHOP-3819', 'Riverwalk Area', 'BWP 14.00', 'Choppies Molapo CFC')">
+                    <i class="fa fa-check"></i> Accept Order
+                </button>
+            </div>
+        </div>
+
+        <!-- Order Card 3 -->
+        <div class="order-card">
+            <div class="order-card-header">
+                <div class="order-id-row">
+                    <strong>#CHOP-3817</strong>
+                    <span class="chip available">Groceries</span>
+                </div>
+                <span style="font-size:0.78rem; color:var(--text-light); font-weight:600;">9 min ago</span>
+            </div>
+            <div class="order-card-body">
+                <div class="route-line">
+                    <div class="route-icons">
+                        <div class="route-dot pickup"></div>
+                        <div class="route-line-connector"></div>
+                        <div class="route-dot dropoff"></div>
+                    </div>
+                    <div class="route-details">
+                        <div class="route-point">
+                            <div class="label">Pickup</div>
+                            <div class="address">Choppies Superstore, Main Mall</div>
+                            <div class="sublabel">Ready now</div>
+                        </div>
+                        <div class="route-point">
+                            <div class="label">Deliver to</div>
+                            <div class="address">Gaborone West, Phase 2</div>
+                            <div class="sublabel">5.8 km · ~14 min drive</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="order-meta">
+                    <div class="meta-item earn"><i class="fa fa-wallet"></i> BWP 26.00</div>
+                    <div class="meta-item"><i class="fa fa-box"></i> 12 items</div>
+                    <div class="meta-item"><i class="fa fa-route"></i> 5.8 km</div>
+                </div>
+            </div>
+            <div class="order-actions">
+                <button class="btn btn-outline"><i class="fa fa-times"></i> Skip</button>
+                <button class="btn btn-blue" onclick="driver.acceptOrder('CHOP-3817', 'Gaborone West', 'BWP 26.00', 'Choppies Main Mall')">
+                    <i class="fa fa-check"></i> Accept Order
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ACTIVE DELIVERY VIEW -->
+<div class="view" id="view-active">
+    <div class="page-top no-border">
+        <div>
+            <h2 id="active-order-id">Active Delivery</h2>
+            <div class="subtitle" id="active-order-dest">Delivering to —</div>
+        </div>
+        <span class="chip active" id="active-step-chip">Heading to pickup</span>
+    </div>
+
+    <!-- Map -->
+    <div class="delivery-map">
+        <svg class="map-route-svg" viewBox="0 0 400 260" preserveAspectRatio="none">
+            <path d="M 40 220 Q 120 180 160 140 Q 200 100 280 80 L 360 60"
+                  stroke="#0066CC" stroke-width="4" stroke-dasharray="10,6"
+                  fill="none" stroke-linecap="round" opacity="0.6"/>
+            <circle cx="40" cy="220" r="8" fill="#0066CC"/>
+            <circle cx="360" cy="60" r="8" fill="#00843D"/>
+        </svg>
+        <div class="map-driver-pin">
+            <div class="driver-pin"><i class="fa fa-motorcycle"></i></div>
+        </div>
+        <div class="eta-pill"><i class="fa fa-clock"></i> <span id="eta-time">8 min</span></div>
+    </div>
+
+    <!-- Steps -->
+    <div class="card" style="margin: 16px;">
+        <div class="pickup-steps">
+            <div class="step-row" id="step-1">
+                <div class="step-num current">1</div>
+                <div class="step-info">
+                    <h4 id="step1-title">Head to Choppies Pickup</h4>
+                    <p id="step1-sub">Navigate to the store and collect the order</p>
+                </div>
+            </div>
+            <div class="step-row" id="step-2">
+                <div class="step-num upcoming">2</div>
+                <div class="step-info">
+                    <h4>Collect Order from Staff</h4>
+                    <p>Show order ID to store staff at the counter</p>
+                </div>
+            </div>
+            <div class="step-row" id="step-3">
+                <div class="step-num upcoming">3</div>
+                <div class="step-info">
+                    <h4>Deliver to Customer</h4>
+                    <p id="step3-sub">Drop off at destination address</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order items summary -->
+        <div class="divider"></div>
+        <div style="padding: 12px 16px 6px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size:0.75rem; font-weight:700; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px;">Order Items</span>
+            <span class="chip available" id="items-count">6 items</span>
+        </div>
+        <div class="order-items-mini">
+            <div class="item-mini-row"><span class="name">Excella 4L Cooking Oil</span><span class="qty">×1</span></div>
+            <div class="item-mini-row"><span class="name">Bokomo Weetbix 450G</span><span class="qty">×2</span></div>
+            <div class="item-mini-row"><span class="name">Coca Cola 2L</span><span class="qty">×3</span></div>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div style="padding: 0 16px 16px; display: flex; gap: 10px;">
+        <button class="btn btn-outline" onclick="driver.callCustomer()"><i class="fa fa-phone"></i> Call</button>
+        <button class="btn btn-blue btn-lg" style="flex:1;" id="active-cta" onclick="driver.nextStep()">
+            <i class="fa fa-navigation"></i> <span id="active-cta-text">Navigate to Pickup</span>
+        </button>
+    </div>
+</div>
+
+<!-- DELIVERY CONFIRMED VIEW -->
+<div class="view" id="view-confirmed">
+    <div class="confirm-screen">
+        <div class="confirm-icon"><i class="fa fa-circle-check"></i></div>
+        <h2>Delivery Complete!</h2>
+        <p>Great work! The order has been delivered successfully. Your earnings have been updated.</p>
+
+        <div class="confirm-detail-card">
+            <div class="confirm-detail-row">
+                <span class="key">Order</span>
+                <span class="val" id="conf-order-id">#CHOP-3821</span>
+            </div>
+            <div class="confirm-detail-row">
+                <span class="key">Delivered to</span>
+                <span class="val" id="conf-dest">Phakalane Estate</span>
+            </div>
+            <div class="confirm-detail-row">
+                <span class="key">Distance</span>
+                <span class="val">3.2 km</span>
+            </div>
+            <div class="confirm-detail-row">
+                <span class="key">Earnings</span>
+                <span class="val green" id="conf-earn">BWP 18.50</span>
+            </div>
+        </div>
+
+        <button class="btn btn-blue btn-block btn-lg" onclick="driver.goToOrders()">
+            <i class="fa fa-list"></i> Find Next Order
+        </button>
+        <button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="driver.navigate('earnings')">
+            <i class="fa fa-wallet"></i> View Earnings
+        </button>
+    </div>
+</div>
+
+<!-- EARNINGS VIEW -->
+<div class="view" id="view-earnings">
+    <div class="earnings-hero">
+        <div class="period">Today's Earnings</div>
+        <div class="amount">BWP 187.50</div>
+        <div class="sub">12 deliveries completed</div>
+        <div class="earnings-period-tabs">
+            <button class="ep-tab active" onclick="driver.switchPeriod(this,'Today')">Today</button>
+            <button class="ep-tab" onclick="driver.switchPeriod(this,'This Week')">This Week</button>
+            <button class="ep-tab" onclick="driver.switchPeriod(this,'This Month')">This Month</button>
+        </div>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-box"><div class="val">12</div><div class="lbl">Deliveries</div></div>
+        <div class="stat-box"><div class="val">38km</div><div class="lbl">Distance</div></div>
+        <div class="stat-box"><div class="val">4.9★</div><div class="lbl">Rating</div></div>
+    </div>
+
+    <div class="section-label" style="margin-top: 8px;">Today's Deliveries</div>
+    <div class="delivery-log">
+        <div class="log-item">
+            <div class="log-info">
+                <div class="log-id">#CHOP-3821 · Phakalane Estate</div>
+                <div class="log-time">3.2 km · Completed 14:32</div>
+            </div>
+            <div class="log-earn">+BWP 18.50</div>
+        </div>
+        <div class="log-item">
+            <div class="log-info">
+                <div class="log-id">#CHOP-3810 · Riverwalk Area</div>
+                <div class="log-time">2.1 km · Completed 13:47</div>
+            </div>
+            <div class="log-earn">+BWP 14.00</div>
+        </div>
+        <div class="log-item">
+            <div class="log-info">
+                <div class="log-id">#CHOP-3804 · Gaborone West</div>
+                <div class="log-time">5.8 km · Completed 12:55</div>
+            </div>
+            <div class="log-earn">+BWP 26.00</div>
+        </div>
+        <div class="log-item">
+            <div class="log-info">
+                <div class="log-id">#CHOP-3797 · Extension 14</div>
+                <div class="log-time">1.9 km · Completed 12:10</div>
+            </div>
+            <div class="log-earn">+BWP 12.00</div>
+        </div>
+        <div class="log-item">
+            <div class="log-info">
+                <div class="log-id">#CHOP-3788 · Masa Centre</div>
+                <div class="log-time">4.3 km · Completed 11:20</div>
+            </div>
+            <div class="log-earn">+BWP 22.00</div>
+        </div>
+    </div>
+</div>
+
+<!-- PROFILE VIEW -->
+<div class="view" id="view-profile">
+    <div class="profile-hero">
+        <div class="profile-avatar"><i class="fa fa-user"></i></div>
+        <h2>Tumelo Molefe</h2>
+        <div class="rating">
+            <span class="rating-stars">★★★★★</span>
+            4.9 rating · 247 deliveries
+        </div>
+    </div>
+
+    <div class="profile-stats">
+        <div class="pstat"><div class="val">247</div><div class="lbl">Deliveries</div></div>
+        <div class="pstat"><div class="val">4.9★</div><div class="lbl">Rating</div></div>
+        <div class="pstat"><div class="val">BWP 12K</div><div class="lbl">Earned</div></div>
+    </div>
+
+    <div class="menu-list">
+        <div class="menu-item">
+            <div class="mi-icon"><i class="fa fa-wallet"></i></div>
+            <div class="mi-text"><h4>Wallet & Payouts</h4><p>Manage your earnings and withdrawals</p></div>
+            <i class="fa fa-chevron-right mi-arrow"></i>
+        </div>
+        <div class="menu-item">
+            <div class="mi-icon"><i class="fa fa-motorcycle"></i></div>
+            <div class="mi-text"><h4>My Vehicle</h4><p>Motorbike · Registration BW 1234</p></div>
+            <i class="fa fa-chevron-right mi-arrow"></i>
+        </div>
+        <div class="menu-item">
+            <div class="mi-icon"><i class="fa fa-star"></i></div>
+            <div class="mi-text"><h4>Reviews</h4><p>See what customers say</p></div>
+            <i class="fa fa-chevron-right mi-arrow"></i>
+        </div>
+        <div class="menu-item">
+            <div class="mi-icon"><i class="fa fa-headset"></i></div>
+            <div class="mi-text"><h4>Driver Support</h4><p>Get help from ChopChop team</p></div>
+            <i class="fa fa-chevron-right mi-arrow"></i>
+        </div>
+        <div class="menu-item" onclick="window.location.href='/site/'">
+            <div class="mi-icon" style="background:#FDECEC; color:var(--red);"><i class="fa fa-right-from-bracket"></i></div>
+            <div class="mi-text"><h4>Switch Role</h4><p>Go back to platform gateway</p></div>
+            <i class="fa fa-chevron-right mi-arrow"></i>
+        </div>
+    </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+    <button class="nav-tab active" onclick="driver.navigate('orders')" data-view="orders">
+        <i class="fa fa-list-ul"></i>
+        <span>Orders</span>
+    </button>
+    <button class="nav-tab" onclick="driver.navigate('active')" data-view="active" style="position:relative;">
+        <i class="fa fa-motorcycle"></i>
+        <span>Active</span>
+        <div class="nav-badge" id="active-badge" style="display:none;">1</div>
+    </button>
+    <button class="nav-tab" onclick="driver.navigate('earnings')" data-view="earnings">
+        <i class="fa fa-wallet"></i>
+        <span>Earnings</span>
+    </button>
+    <button class="nav-tab" onclick="driver.navigate('profile')" data-view="profile">
+        <i class="fa fa-user"></i>
+        <span>Profile</span>
+    </button>
+</nav>
+
+<script>
+    const driver = {
+        state: {
+            isOnline: true,
+            activeOrder: null,
+            deliveryStep: 0
+        },
+
+        navigate(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            const target = document.getElementById('view-' + viewId);
+            if (target) target.classList.add('active');
+            document.querySelectorAll('.nav-tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.view === viewId);
+            });
+            window.scrollTo(0, 0);
+        },
+
+        toggleOnline() {
+            this.state.isOnline = !this.state.isOnline;
+            const dot = document.getElementById('statusDot');
+            const label = document.getElementById('statusLabel');
+            if (this.state.isOnline) {
+                dot.classList.remove('offline');
+                label.textContent = 'Online';
+            } else {
+                dot.classList.add('offline');
+                label.textContent = 'Offline';
+            }
+        },
+
+        acceptOrder(id, dest, earn, store) {
+            this.state.activeOrder = { id, dest, earn, store };
+            this.state.deliveryStep = 0;
+
+            document.getElementById('active-order-id').textContent = '#' + id;
+            document.getElementById('active-order-dest').textContent = 'Delivering to ' + dest;
+            document.getElementById('step1-title').textContent = 'Head to ' + store;
+            document.getElementById('step3-sub').textContent = 'Drop off at ' + dest;
+            document.getElementById('active-cta-text').textContent = 'Navigate to Pickup';
+            document.getElementById('active-step-chip').textContent = 'Heading to pickup';
+            document.getElementById('eta-time').textContent = '8 min';
+
+            // Reset steps
+            document.getElementById('step-1').querySelector('.step-num').className = 'step-num current';
+            document.getElementById('step-2').querySelector('.step-num').className = 'step-num upcoming';
+            document.getElementById('step-3').querySelector('.step-num').className = 'step-num upcoming';
+
+            document.getElementById('active-badge').style.display = 'flex';
+            this.navigate('active');
+        },
+
+        nextStep() {
+            this.state.deliveryStep++;
+            const step = this.state.deliveryStep;
+
+            if (step === 1) {
+                // Arrived at store
+                document.getElementById('step-1').querySelector('.step-num').className = 'step-num done';
+                document.getElementById('step-1').querySelector('.step-num').textContent = '✓';
+                document.getElementById('step-2').querySelector('.step-num').className = 'step-num current';
+                document.getElementById('active-cta-text').textContent = 'Order Collected — Navigate to Customer';
+                document.getElementById('active-step-chip').textContent = 'At pickup point';
+                document.getElementById('eta-time').textContent = 'At store';
+            } else if (step === 2) {
+                // Heading to customer
+                document.getElementById('step-2').querySelector('.step-num').className = 'step-num done';
+                document.getElementById('step-2').querySelector('.step-num').textContent = '✓';
+                document.getElementById('step-3').querySelector('.step-num').className = 'step-num current';
+                document.getElementById('active-cta-text').textContent = 'Confirm Delivery';
+                document.getElementById('active-step-chip').textContent = 'En route to customer';
+                document.getElementById('eta-time').textContent = '12 min';
+            } else if (step === 3) {
+                // Delivered
+                this.confirmDelivery();
+            }
+        },
+
+        confirmDelivery() {
+            const o = this.state.activeOrder;
+            document.getElementById('conf-order-id').textContent = '#' + o.id;
+            document.getElementById('conf-dest').textContent = o.dest;
+            document.getElementById('conf-earn').textContent = o.earn;
+            document.getElementById('active-badge').style.display = 'none';
+            this.navigate('confirmed');
+        },
+
+        goToOrders() {
+            this.state.activeOrder = null;
+            this.state.deliveryStep = 0;
+            this.navigate('orders');
+        },
+
+        declineOrder() {
+            const cards = document.querySelectorAll('.order-card');
+            if (cards.length > 0) {
+                cards[0].style.transition = 'opacity 0.3s, transform 0.3s';
+                cards[0].style.opacity = '0';
+                cards[0].style.transform = 'translateX(-20px)';
+                setTimeout(() => cards[0].remove(), 300);
+            }
+        },
+
+        callCustomer() {
+            alert('Calling customer… (prototype — no real call placed)');
+        },
+
+        switchPeriod(btn, period) {
+            document.querySelectorAll('.ep-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            const amounts = { 'Today': 'BWP 187.50', 'This Week': 'BWP 1,240.00', 'This Month': 'BWP 4,890.00' };
+            document.querySelector('.earnings-hero .amount').textContent = amounts[period] || 'BWP 187.50';
+            document.querySelector('.earnings-hero .period').textContent = period + "'s Earnings";
+        }
+    };
+</script>
+</body>
+</html>

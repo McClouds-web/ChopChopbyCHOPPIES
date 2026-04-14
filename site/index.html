@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChopChop by Choppies | Platform Gateway</title>
+    <meta name="description" content="ChopChop by Choppies — Choose your role to access the platform.">
+    <meta name="theme-color" content="#00843D">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --green: #00843D;
+            --green-dark: #006E33;
+            --green-light: #E5F3EB;
+            --red: #E31C23;
+            --red-dark: #C6181E;
+            --white: #FFFFFF;
+            --bg: #F8F9FA;
+            --text: #222222;
+            --text-mid: #555555;
+            --text-light: #999999;
+            --border: #E0E0E0;
+            --shadow: 0 4px 20px rgba(0,0,0,0.07);
+            --shadow-hover: 0 12px 40px rgba(0,0,0,0.13);
+            --radius: 20px;
+            --font: 'Inter', -apple-system, sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; font-family: var(--font); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+
+        /* === LAYOUT === */
+        .gateway {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* === HEADER === */
+        .gateway-header {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .gateway-header .logo img { height: 38px; }
+        .gateway-badge {
+            background: var(--green-light);
+            color: var(--green);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* === HERO === */
+        .gateway-hero {
+            background: linear-gradient(140deg, var(--green) 0%, #00A650 60%, #00C558 100%);
+            padding: 60px 24px 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .gateway-hero::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 300px; height: 300px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 50%;
+        }
+        .gateway-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -80px; left: -40px;
+            width: 220px; height: 220px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        .hero-content { position: relative; z-index: 2; max-width: 600px; margin: 0 auto; }
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.95);
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .hero-content h1 {
+            color: var(--white);
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            line-height: 1.15;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+        .hero-content p {
+            color: rgba(255,255,255,0.85);
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* === CARDS SECTION === */
+        .gateway-cards-section {
+            flex: 1;
+            padding: 0 16px 60px;
+            margin-top: -40px;
+            position: relative;
+            z-index: 10;
+        }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* === ROLE CARD === */
+        .role-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 32px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            border: 1px solid transparent;
+            text-decoration: none;
+            color: inherit;
+        }
+        .role-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-hover);
+        }
+        .role-card.consumer:hover { border-color: var(--green); }
+        .role-card.driver:hover { border-color: #0066CC; }
+        .role-card.merchant:hover { border-color: var(--red); }
+
+        .card-icon-wrap {
+            width: 68px;
+            height: 68px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+        .consumer .card-icon-wrap { background: var(--green-light); color: var(--green); }
+        .driver .card-icon-wrap { background: #E8F0FE; color: #0066CC; }
+        .merchant .card-icon-wrap { background: #FDECEC; color: var(--red); }
+
+        .card-body { flex: 1; }
+        .card-tag {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .consumer .card-tag { color: var(--green); }
+        .driver .card-tag { color: #0066CC; }
+        .merchant .card-tag { color: var(--red); }
+
+        .card-body h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+        .card-body p {
+            font-size: 0.95rem;
+            color: var(--text-mid);
+            line-height: 1.6;
+            margin: 0;
+        }
+        .card-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .feature-pill {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: var(--bg);
+            color: var(--text-mid);
+        }
+
+        .card-cta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+        .consumer .card-cta { background: var(--green); color: var(--white); }
+        .consumer .card-cta:hover { background: var(--green-dark); }
+        .driver .card-cta { background: #0066CC; color: var(--white); }
+        .driver .card-cta:hover { background: #0055AA; }
+        .merchant .card-cta { background: var(--red); color: var(--white); }
+        .merchant .card-cta:hover { background: var(--red-dark); }
+
+        /* === STATS BAR === */
+        .stats-bar {
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 24px 16px;
+            margin-bottom: 0;
+        }
+        .stats-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            text-align: center;
+        }
+        .stat-item h3 {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--green);
+            margin-bottom: 4px;
+        }
+        .stat-item p {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* === FOOTER === */
+        .gateway-footer {
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            padding: 24px 16px;
+            text-align: center;
+        }
+        .gateway-footer p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin: 0;
+        }
+        .gateway-footer span { color: var(--green); font-weight: 600; }
+
+        /* === DESKTOP === */
+        @media (min-width: 768px) {
+            .gateway-hero { padding: 80px 24px 100px; }
+            .cards-grid { grid-template-columns: repeat(3, 1fr); gap: 28px; }
+            .gateway-cards-section { padding: 0 24px 80px; margin-top: -50px; }
+            .role-card { padding: 36px 32px; }
+            .card-cta { width: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="gateway">
+        <!-- Header -->
+        <header class="gateway-header">
+            <div class="logo">
+                <img src="/assets/logo.png" alt="ChopChop by Choppies">
+            </div>
+            <span class="gateway-badge"><i class="fa fa-layer-group"></i> &nbsp;Platform Gateway</span>
+        </header>
+
+        <!-- Hero -->
+        <div class="gateway-hero">
+            <div class="hero-content">
+                <div class="hero-eyebrow"><i class="fa fa-bolt"></i> Botswana's Quick-Commerce Platform</div>
+                <h1>Who are you here as today?</h1>
+                <p>ChopChop powers shoppers, drivers, and merchants — all in one platform. Choose your role to get started.</p>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stats-inner">
+                <div class="stat-item">
+                    <h3>45min</h3>
+                    <p>Average delivery</p>
+                </div>
+                <div class="stat-item">
+                    <h3>3K+</h3>
+                    <p>Products available</p>
+                </div>
+                <div class="stat-item">
+                    <h3>100+</h3>
+                    <p>Active drivers</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Role Cards -->
+        <div class="gateway-cards-section">
+            <div class="cards-grid">
+
+                <!-- Consumer -->
+                <a class="role-card consumer" href="/">
+                    <div class="card-icon-wrap">
+                        <i class="fa fa-basket-shopping"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-tag">Consumer</div>
+                        <h2>Shop Groceries</h2>
+                        <p>Order groceries, fresh produce, and ready meals from Choppies — delivered to your door in under an hour.</p>
+                        <div class="card-features">
+                            <span class="feature-pill">🛒 10+ Categories</span>
+                            <span class="feature-pill">⚡ 45-min delivery</span>
+                            <span class="feature-pill">📍 Live tracking</span>
+                        </div>
+                    </div>
+                    <a class="card-cta" href="/">
+                        <i class="fa fa-basket-shopping"></i> Shop with ChopChop
+                    </a>
+                </a>
+
+                <!-- Driver -->
+                <a class="role-card driver" href="/driver/">
+                    <div class="card-icon-wrap">
+                        <i class="fa fa-motorcycle"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-tag">Driver</div>
+                        <h2>Deliver with Us</h2>
+                        <p>Pick up and deliver orders in your area. Set your own hours, track your earnings, and grow your income.</p>
+                        <div class="card-features">
+                            <span class="feature-pill">💰 Daily earnings</span>
+                            <span class="feature-pill">🗺️ Turn-by-turn nav</span>
+                            <span class="feature-pill">🕐 Flexible hours</span>
+                        </div>
+                    </div>
+                    <a class="card-cta" href="/driver/">
+                        <i class="fa fa-motorcycle"></i> Deliver with ChopChop
+                    </a>
+                </a>
+
+                <!-- Merchant -->
+                <a class="role-card merchant" href="/merchant/">
+                    <div class="card-icon-wrap">
+                        <i class="fa fa-store"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-tag">Merchant</div>
+                        <h2>Manage Your Store</h2>
+                        <p>Accept incoming orders, update product availability, manage order status, and control your store settings.</p>
+                        <div class="card-features">
+                            <span class="feature-pill">📦 Order management</span>
+                            <span class="feature-pill">🏪 Product control</span>
+                            <span class="feature-pill">📊 Sales insights</span>
+                        </div>
+                    </div>
+                    <a class="card-cta" href="/merchant/">
+                        <i class="fa fa-store"></i> Manage Store
+                    </a>
+                </a>
+
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="gateway-footer">
+            <p>&copy; 2024 <span>Choppies Supermarkets</span> · ChopChop Quick-Commerce Platform · Botswana, Zambia, Zimbabwe</p>
+        </footer>
+    </div>
+</body>
+</html>

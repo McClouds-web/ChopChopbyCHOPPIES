@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChopChop by Choppies | Groceries Delivered Fast</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="ChopChop by Choppies - Botswana's fastest grocery delivery platform. Get your groceries, fresh produce, and takeaways in 45-60 minutes.">
+    <meta name="keywords" content="Choppies, ChopChop, Botswana, Grocery Delivery, Gaborone, Supermarket Online">
+    
+    <!-- Brand Identity -->
+    <meta name="theme-color" content="#00843D">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    
+    <div id="app">
+        <!-- Desktop Header (hidden on mobile) -->
+        <header id="desktop-header" class="desktop-only">
+            <div class="container header-container">
+                <div class="logo" onclick="app.navigate('home')">
+                    <img src="assets/logo.png" alt="ChopChop by Choppies" style="height: 45px; margin-top: 5px;">
+                </div>
+                <div class="desktop-search">
+                    <i class="fa fa-search"></i>
+                    <input type="text" placeholder="Search groceries, meals, or essentials...">
+                </div>
+                <div class="desktop-nav">
+                    <button class="nav-btn" onclick="app.navigate('home')"><i class="fa fa-home"></i> Home</button>
+                    <button class="nav-btn" onclick="app.navigate('categories')"><i class="fa fa-th-large"></i> Categories</button>
+                    <button class="nav-btn cart-nav-btn" onclick="app.navigate('cart')">
+                        <i class="fa fa-shopping-cart"></i> Cart
+                        <span class="cart-badge" id="desktop-cart-badge">0</span>
+                    </button>
+                    <button class="nav-btn" onclick="app.navigate('orders')"><i class="fa fa-receipt"></i> Orders</button>
+                    <button class="nav-btn" onclick="app.navigate('profile')"><i class="fa fa-user"></i> Profile</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main id="main-content">
+            <!-- Splash Screen -->
+            <section id="splash-screen" class="view active">
+                <div class="splash-center">
+                    <div class="splash-logo">
+                        <img src="assets/logo.png" alt="ChopChop by Choppies" style="max-width: 250px; margin-bottom: 2rem;">
+                    </div>
+                    <p class="splash-subtitle">Groceries Delivered Fast</p>
+                    <div class="loader"></div>
+                </div>
+            </section>
+
+            <!-- Home Screen -->
+            <section id="home-screen" class="view">
+                <!-- Mobile Header -->
+                <div class="mobile-header mobile-only">
+                    <div class="mobile-header-top">
+                        <div class="logo"><img src="assets/logo.png" alt="ChopChop by Choppies" style="height: 35px;"></div>
+                        <div class="delivery-time">
+                            <i class="fa fa-bolt"></i> 45-60 min
+                        </div>
+                    </div>
+                    <div class="search-bar">
+                        <i class="fa fa-search"></i>
+                        <input type="text" placeholder="Search groceries, meals...">
+                    </div>
+                </div>
+
+                <div class="container section-padding">
+                    <!-- Promo Banner -->
+                    <div class="promo-banner">
+                        <div class="promo-content">
+                            <h2>Weekend Deals!</h2>
+                            <p>Up to 50% off on fresh produce</p>
+                            <button class="btn btn-red" onclick="app.navigate('categories')">Shop Now</button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Categories -->
+                    <div class="section-title">
+                        <h3>Shop by Category</h3>
+                        <a href="javascript:void(0)" onclick="app.navigate('categories')">See All</a>
+                    </div>
+                    <div class="quick-categories" id="home-quick-categories">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <!-- Weekly Specials -->
+                    <div class="section-title">
+                        <h3>Weekly Specials</h3>
+                    </div>
+                    <div class="product-grid" id="home-specials-grid">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <!-- Popular Products -->
+                    <div class="section-title mt-4">
+                        <h3>Popular Near You</h3>
+                    </div>
+                    <div class="product-grid" id="home-popular-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Categories Screen -->
+            <section id="categories-screen" class="view">
+                <div class="page-header">
+                    <h2>Categories</h2>
+                </div>
+                <div class="container section-padding">
+                    <div class="category-list" id="category-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Product Listing Route -->
+            <section id="products-screen" class="view">
+                <div class="page-header with-back">
+                    <button class="back-btn" onclick="app.navigate('categories')"><i class="fa fa-arrow-left"></i></button>
+                    <h2 id="plp-title">Category Name</h2>
+                </div>
+                <div class="container section-padding">
+                    <div class="product-grid" id="plp-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Product Detail Screen -->
+            <section id="product-detail-screen" class="view">
+                <div class="page-header with-back transparent">
+                    <button class="back-btn" onclick="app.goBack()"><i class="fa fa-arrow-left"></i></button>
+                </div>
+                <div id="pdp-content">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+
+            <!-- Cart Screen -->
+            <section id="cart-screen" class="view">
+                <div class="page-header">
+                    <h2>Your Cart</h2>
+                </div>
+                <div class="container section-padding cart-layout">
+                    <div class="cart-items-container" id="cart-items">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div class="cart-summary" id="cart-summary">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Checkout Screen -->
+            <section id="checkout-screen" class="view">
+                <div class="page-header with-back">
+                    <button class="back-btn" onclick="app.navigate('cart')"><i class="fa fa-arrow-left"></i></button>
+                    <h2>Checkout</h2>
+                </div>
+                <div class="container section-padding checkout-layout">
+                    <div class="checkout-form">
+                        <div class="checkout-card">
+                            <h3>Delivery Details</h3>
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" placeholder="John Doe">
+                            </div>
+                            <div class="form-group">
+                                <label>Phone Mobile</label>
+                                <input type="tel" placeholder="+267 7X XXX XXX">
+                            </div>
+                            <div class="form-group">
+                                <label>Delivery Address</label>
+                                <textarea placeholder="Plot Number, Street, Suburb (e.g., Phakalane)"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="checkout-card mt-4">
+                            <h3>Payment Options</h3>
+                            <div class="payment-options">
+                                <label class="payment-option border-active">
+                                    <input type="radio" name="payment" checked>
+                                    <div class="pay-info">
+                                        <i class="fa fa-credit-card"></i> Pay Online (Card)
+                                    </div>
+                                </label>
+                                <label class="payment-option">
+                                    <input type="radio" name="payment">
+                                    <div class="pay-info">
+                                        <i class="fa fa-money-bill-wave"></i> Cash on Delivery
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary btn-block mt-4" style="margin-bottom: 2rem;" onclick="app.placeOrder()">Place Order</button>
+                    </div>
+
+                    <div class="checkout-summary" id="checkout-summary">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Order Tracking Screen -->
+            <section id="tracking-screen" class="view">
+                <div class="page-header">
+                    <h2>Order Tracking</h2>
+                </div>
+                <div class="container section-padding">
+                    <div class="tracking-card">
+                        <div class="tracking-header">
+                            <div class="eta">
+                                <h3>Estimated Arrival</h3>
+                                <p class="time">45 min</p>
+                            </div>
+                            <div class="order-id">
+                                <p>Order #CHOP-8921</p>
+                            </div>
+                        </div>
+                        
+                        <div class="map-placeholder">
+                            <i class="fa fa-map-marked-alt"></i>
+                            <p>Live tracking available once driver picks up order.</p>
+                        </div>
+
+                        <ul class="tracking-timeline">
+                            <li class="timeline-item active">
+                                <div class="icon"><i class="fa fa-check"></i></div>
+                                <div class="info">
+                                    <h4>Order Accepted</h4>
+                                    <p>Choppies Superstore is preparing your order</p>
+                                </div>
+                            </li>
+                            <li class="timeline-item active">
+                                <div class="icon"><i class="fa fa-box"></i></div>
+                                <div class="info">
+                                    <h4>Packing</h4>
+                                    <p>Your items are being packed</p>
+                                </div>
+                            </li>
+                            <li class="timeline-item">
+                                <div class="icon"><i class="fa fa-motorcycle"></i></div>
+                                <div class="info">
+                                    <h4>Out for Delivery</h4>
+                                    <p>Rider will pick up shortly</p>
+                                </div>
+                            </li>
+                            <li class="timeline-item">
+                                <div class="icon"><i class="fa fa-home"></i></div>
+                                <div class="info">
+                                    <h4>Delivered</h4>
+                                </div>
+                            </li>
+                        </ul>
+                        
+                        <div class="rider-info mt-4" style="text-align: center; display: none;" id="rider-info">
+                            <button class="btn btn-secondary-outline">Contact Rider</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation (Mobile Only) -->
+        <nav id="bottom-nav" class="mobile-only">
+            <button class="nav-item active" onclick="app.navigate('home')" data-target="home">
+                <i class="fa fa-home"></i>
+                <span>Home</span>
+            </button>
+            <button class="nav-item" onclick="app.navigate('categories')" data-target="categories">
+                <i class="fa fa-th-large"></i>
+                <span>Categories</span>
+            </button>
+            <button class="nav-item cart-nav-btn" onclick="app.navigate('cart')" data-target="cart">
+                <div class="icon-wrap">
+                    <i class="fa fa-shopping-cart"></i>
+                    <span class="cart-badge" id="mobile-cart-badge">0</span>
+                </div>
+                <span>Cart</span>
+            </button>
+            <button class="nav-item" onclick="app.navigate('orders')" data-target="orders">
+                <i class="fa fa-receipt"></i>
+                <span>Orders</span>
+            </button>
+            <button class="nav-item" onclick="app.navigate('profile')" data-target="profile">
+                <i class="fa fa-user"></i>
+                <span>Profile</span>
+            </button>
+        </nav>
+        
+        <!-- Toast Notification -->
+        <div id="toast" class="toast">Added to cart</div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

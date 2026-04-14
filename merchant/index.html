@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChopChop Merchant | Store Dashboard</title>
+    <meta name="theme-color" content="#E31C23">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --red: #E31C23;
+            --red-dark: #C6181E;
+            --red-light: #FDECEC;
+            --green: #00843D;
+            --green-light: #E5F3EB;
+            --blue: #0066CC;
+            --blue-light: #E8F0FE;
+            --orange: #F59E0B;
+            --orange-light: #FEF3C7;
+            --white: #FFFFFF;
+            --bg: #F5F6FA;
+            --text: #1A1A2E;
+            --text-mid: #555;
+            --text-light: #999;
+            --border: #E2E8F0;
+            --shadow: 0 2px 12px rgba(0,0,0,0.07);
+            --shadow-md: 0 6px 24px rgba(0,0,0,0.1);
+            --radius: 14px;
+            --radius-sm: 8px;
+            --nav-h: 65px;
+            --header-h: 64px;
+            --font: 'Inter', -apple-system, sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+        .view { display: none; min-height: 100vh; padding-bottom: calc(var(--nav-h) + 16px); }
+        .view.active { display: block; animation: fadeUp 0.25s ease; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* === HEADER === */
+        .app-header {
+            background: var(--red);
+            height: var(--header-h);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 16px;
+            position: sticky; top: 0; z-index: 200;
+            box-shadow: 0 2px 8px rgba(227,28,35,0.3);
+        }
+        .brand { display: flex; align-items: center; gap: 10px; }
+        .brand-icon {
+            width: 38px; height: 38px; background: rgba(255,255,255,0.2);
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            color: var(--white); font-size: 1.1rem;
+        }
+        .brand-text h1 { color: var(--white); font-size: 1rem; font-weight: 800; line-height: 1; }
+        .brand-text span { color: rgba(255,255,255,0.75); font-size: 0.72rem; font-weight: 500; }
+        .store-toggle {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.15); border-radius: 20px;
+            padding: 6px 12px; cursor: pointer; transition: background 0.2s;
+        }
+        .store-toggle:hover { background: rgba(255,255,255,0.25); }
+        .store-dot {
+            width: 10px; height: 10px; border-radius: 50%; background: #4ADE80;
+            box-shadow: 0 0 0 3px rgba(74,222,128,0.3); transition: all 0.3s;
+        }
+        .store-dot.closed { background: rgba(255,255,255,0.4); box-shadow: none; }
+        .store-toggle span { color: var(--white); font-size: 0.82rem; font-weight: 600; }
+
+        /* === BOTTOM NAV === */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: var(--white); height: var(--nav-h);
+            display: flex; align-items: center;
+            border-top: 1px solid var(--border);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+            z-index: 200;
+        }
+        .nav-tab {
+            flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+            border: none; background: transparent; color: var(--text-light);
+            font-size: 0.72rem; font-weight: 600; cursor: pointer;
+            transition: color 0.2s; padding: 10px 0; position: relative;
+        }
+        .nav-tab i { font-size: 1.2rem; }
+        .nav-tab.active { color: var(--red); }
+        .nav-badge {
+            position: absolute; top: 8px; right: calc(50% - 18px);
+            background: var(--red); color: var(--white);
+            font-size: 0.65rem; font-weight: 800;
+            min-width: 16px; height: 16px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0 4px;
+        }
+
+        /* === UTILITIES === */
+        .pad { padding: 16px; }
+        .section-label {
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 0.8px;
+            text-transform: uppercase; color: var(--text-light);
+            margin-bottom: 12px; padding: 0 16px;
+        }
+        .card {
+            background: var(--white); border-radius: var(--radius);
+            box-shadow: var(--shadow); overflow: hidden;
+        }
+        .divider { height: 1px; background: var(--border); }
+
+        /* === CHIPS === */
+        .chip {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 10px; border-radius: 20px;
+            font-size: 0.72rem; font-weight: 700;
+        }
+        .chip.new { background: var(--blue-light); color: var(--blue); }
+        .chip.preparing { background: var(--orange-light); color: #B45309; }
+        .chip.ready { background: var(--green-light); color: var(--green); }
+        .chip.completed { background: #F1F5F9; color: var(--text-light); }
+        .chip.cancelled { background: var(--red-light); color: var(--red); }
+
+        /* === BUTTONS === */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 11px 18px; border-radius: 10px; border: none;
+            font-weight: 700; font-size: 0.88rem; cursor: pointer;
+            transition: all 0.2s; font-family: var(--font);
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-red { background: var(--red); color: var(--white); }
+        .btn-red:hover { background: var(--red-dark); }
+        .btn-green { background: var(--green); color: var(--white); }
+        .btn-green:hover { background: #006E33; }
+        .btn-blue { background: var(--blue); color: var(--white); }
+        .btn-outline { background: var(--bg); color: var(--text-mid); border: 1px solid var(--border); }
+        .btn-sm { padding: 7px 12px; font-size: 0.8rem; border-radius: 8px; }
+        .btn-block { width: 100%; }
+        .btn-lg { padding: 15px 24px; font-size: 0.95rem; border-radius: 12px; }
+
+        /* === DASHBOARD VIEW === */
+        .dash-hero {
+            background: linear-gradient(135deg, var(--red) 0%, #FF3A3A 100%);
+            padding: 20px 16px 28px;
+        }
+        .dash-welcome { color: rgba(255,255,255,0.85); font-size: 0.85rem; font-weight: 500; margin-bottom: 4px; }
+        .dash-store { color: var(--white); font-size: 1.3rem; font-weight: 800; margin-bottom: 14px; }
+        .dash-kpi-row {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+        }
+        .kpi-box {
+            background: rgba(255,255,255,0.15); border-radius: 12px; padding: 12px 10px;
+            text-align: center;
+        }
+        .kpi-box .kval { color: var(--white); font-size: 1.4rem; font-weight: 900; line-height: 1; }
+        .kpi-box .klbl { color: rgba(255,255,255,0.8); font-size: 0.7rem; font-weight: 600; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .kpi-box .kdiff { font-size: 0.7rem; color: rgba(255,255,255,0.7); margin-top: 2px; }
+
+        .alert-banner {
+            background: var(--orange-light); border-left: 4px solid var(--orange);
+            padding: 12px 16px; display: flex; align-items: center; gap: 10px;
+            font-size: 0.85rem; font-weight: 600; color: #B45309;
+        }
+
+        /* === ORDER CARDS === */
+        .order-filters {
+            background: var(--white); padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex; gap: 8px; overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .order-filters::-webkit-scrollbar { display: none; }
+        .filter-btn {
+            padding: 7px 14px; border-radius: 20px; border: none;
+            font-size: 0.8rem; font-weight: 600; cursor: pointer;
+            background: var(--bg); color: var(--text-mid);
+            white-space: nowrap; transition: all 0.2s; font-family: var(--font);
+        }
+        .filter-btn.active { background: var(--red); color: var(--white); }
+
+        .orders-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 12px; }
+        .order-item {
+            background: var(--white); border-radius: var(--radius);
+            box-shadow: var(--shadow); overflow: hidden;
+            border-left: 4px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .order-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .order-item.new-order { border-left-color: var(--blue); }
+        .order-item.preparing { border-left-color: var(--orange); }
+        .order-item.ready { border-left-color: var(--green); }
+        .order-item.completed { border-left-color: var(--text-light); opacity: 0.75; }
+
+        .order-item-header {
+            padding: 12px 16px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .order-item-title { font-weight: 700; font-size: 0.95rem; }
+        .order-item-meta {
+            padding: 0 16px 12px;
+            display: flex; gap: 16px; align-items: center;
+        }
+        .meta-pill { font-size: 0.78rem; color: var(--text-mid); display: flex; align-items: center; gap: 5px; }
+        .order-item-actions {
+            padding: 10px 16px;
+            border-top: 1px solid var(--border);
+            display: flex; gap: 8px;
+        }
+
+        /* === ORDER DETAIL VIEW === */
+        .page-top {
+            background: var(--white); padding: 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 12px; position: sticky; top: var(--header-h); z-index: 100;
+        }
+        .back-btn {
+            width: 38px; height: 38px; border-radius: 50%;
+            background: var(--bg); border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 1rem; color: var(--text);
+        }
+        .page-top h2 { font-size: 1.1rem; font-weight: 700; flex: 1; }
+
+        .order-detail-header {
+            background: var(--white); padding: 20px 16px; border-bottom: 1px solid var(--border);
+        }
+        .order-detail-id { font-size: 1.4rem; font-weight: 900; margin-bottom: 6px; }
+        .order-detail-time { font-size: 0.82rem; color: var(--text-mid); margin-bottom: 14px; }
+        .status-flow {
+            display: flex; align-items: center; gap: 4px; overflow-x: auto;
+            scrollbar-width: none; padding-bottom: 4px;
+        }
+        .status-flow::-webkit-scrollbar { display: none; }
+        .status-node {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            min-width: 64px;
+        }
+        .status-node .dot {
+            width: 32px; height: 32px; border-radius: 50%;
+            border: 2px solid var(--border); background: var(--bg);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; color: var(--text-light);
+        }
+        .status-node.done .dot { background: var(--green); border-color: var(--green); color: var(--white); }
+        .status-node.active .dot { background: var(--orange); border-color: var(--orange); color: var(--white); }
+        .status-node .node-label { font-size: 0.65rem; font-weight: 600; color: var(--text-light); text-align: center; }
+        .status-node.done .node-label { color: var(--green); }
+        .status-node.active .node-label { color: var(--orange); }
+        .status-connector { flex: 1; height: 2px; background: var(--border); min-width: 20px; }
+        .status-connector.done { background: var(--green); }
+
+        .customer-card {
+            background: var(--white); padding: 16px;
+            display: flex; align-items: center; gap: 14px;
+        }
+        .cust-avatar {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: var(--bg); display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; color: var(--text-light); flex-shrink: 0;
+        }
+        .cust-info h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 2px; }
+        .cust-info p { font-size: 0.82rem; color: var(--text-mid); margin: 0; }
+        .cust-action { margin-left: auto; }
+
+        .order-items-list { padding: 0 16px; }
+        .order-item-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 0; border-bottom: 1px solid var(--border);
+        }
+        .order-item-row:last-child { border-bottom: none; }
+        .item-img {
+            width: 48px; height: 48px; border-radius: 8px;
+            background: var(--bg); display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; flex-shrink: 0;
+        }
+        .item-detail { flex: 1; }
+        .item-detail .item-name { font-size: 0.9rem; font-weight: 600; margin-bottom: 2px; }
+        .item-detail .item-qty { font-size: 0.78rem; color: var(--text-mid); }
+        .item-price { font-weight: 700; font-size: 0.9rem; }
+
+        .order-total-row {
+            background: var(--white); padding: 16px;
+            border-top: 1px solid var(--border);
+        }
+        .total-line {
+            display: flex; justify-content: space-between;
+            padding: 6px 0; font-size: 0.88rem; color: var(--text-mid);
+        }
+        .total-line.grand { font-size: 1rem; font-weight: 800; color: var(--text); border-top: 1px solid var(--border); padding-top: 12px; margin-top: 6px; }
+
+        .status-action-bar {
+            padding: 16px; background: var(--white);
+            border-top: 1px solid var(--border); display: flex; gap: 10px;
+        }
+
+        /* === PRODUCTS VIEW === */
+        .product-search {
+            background: var(--white); padding: 12px 16px;
+            border-bottom: 1px solid var(--border); position: sticky;
+            top: var(--header-h); z-index: 100;
+        }
+        .search-input {
+            display: flex; align-items: center; gap: 10px;
+            background: var(--bg); border-radius: 10px; padding: 10px 14px;
+        }
+        .search-input i { color: var(--text-light); }
+        .search-input input {
+            border: none; background: transparent; flex: 1;
+            font-size: 0.9rem; outline: none; font-family: var(--font);
+            color: var(--text);
+        }
+
+        .product-section-header {
+            padding: 14px 16px 8px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .product-section-header h3 { font-size: 0.88rem; font-weight: 700; color: var(--text-mid); text-transform: uppercase; letter-spacing: 0.5px; }
+        .product-section-header span { font-size: 0.78rem; color: var(--text-light); }
+
+        .product-row {
+            background: var(--white); padding: 14px 16px;
+            display: flex; align-items: center; gap: 14px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+        .product-row:last-child { border-bottom: none; }
+        .product-row:hover { background: #FAFAFA; }
+        .prod-img {
+            width: 52px; height: 52px; border-radius: 8px;
+            background: var(--bg); overflow: hidden; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .prod-img img { width: 100%; height: 100%; object-fit: contain; }
+        .prod-info { flex: 1; }
+        .prod-info .prod-name { font-size: 0.9rem; font-weight: 600; margin-bottom: 2px; }
+        .prod-info .prod-cat { font-size: 0.75rem; color: var(--text-light); }
+        .prod-price { font-size: 0.9rem; font-weight: 700; color: var(--text); margin-right: 12px; }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            width: 44px; height: 24px; border-radius: 12px;
+            background: var(--border); position: relative; cursor: pointer;
+            transition: background 0.25s; flex-shrink: 0;
+        }
+        .toggle-switch.on { background: var(--green); }
+        .toggle-switch::after {
+            content: ''; position: absolute; top: 3px; left: 3px;
+            width: 18px; height: 18px; border-radius: 50%;
+            background: var(--white); box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+            transition: left 0.25s;
+        }
+        .toggle-switch.on::after { left: 23px; }
+
+        /* === SETTINGS VIEW === */
+        .settings-hero {
+            background: var(--white); padding: 24px 16px;
+            border-bottom: 1px solid var(--border); text-align: center;
+        }
+        .store-logo-circle {
+            width: 80px; height: 80px; border-radius: 20px;
+            background: var(--red-light); color: var(--red);
+            font-size: 2rem; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 12px;
+        }
+        .settings-hero h2 { font-size: 1.2rem; font-weight: 800; margin-bottom: 4px; }
+        .settings-hero p { font-size: 0.82rem; color: var(--text-mid); margin: 0; }
+
+        .settings-section { margin-bottom: 8px; }
+        .setting-row {
+            background: var(--white); padding: 14px 16px;
+            display: flex; align-items: center; gap: 14px;
+            border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s;
+        }
+        .setting-row:hover { background: #FAFAFA; }
+        .setting-row:last-child { border-bottom: none; }
+        .set-icon {
+            width: 38px; height: 38px; border-radius: 10px;
+            background: var(--red-light); color: var(--red);
+            display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0;
+        }
+        .set-icon.green { background: var(--green-light); color: var(--green); }
+        .set-icon.blue { background: var(--blue-light); color: var(--blue); }
+        .set-icon.orange { background: var(--orange-light); color: #B45309; }
+        .set-text { flex: 1; }
+        .set-text h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 2px; }
+        .set-text p { font-size: 0.78rem; color: var(--text-mid); margin: 0; }
+        .set-right { color: var(--text-light); font-size: 0.85rem; font-weight: 600; }
+
+        .availability-card {
+            background: var(--white); margin: 16px;
+            border-radius: var(--radius); box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        .avail-header {
+            background: linear-gradient(135deg, var(--green) 0%, #00A650 100%);
+            padding: 16px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .avail-header.closed { background: linear-gradient(135deg, #9CA3AF 0%, #6B7280 100%); }
+        .avail-header h3 { color: var(--white); font-size: 1rem; font-weight: 700; }
+        .avail-header .avail-status { color: rgba(255,255,255,0.9); font-size: 0.8rem; }
+        .avail-toggle-btn {
+            background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4);
+            color: var(--white); font-weight: 700; font-size: 0.82rem;
+            padding: 6px 14px; border-radius: 20px; cursor: pointer;
+            font-family: var(--font); transition: all 0.2s;
+        }
+        .avail-toggle-btn:hover { background: rgba(255,255,255,0.35); }
+
+        .hours-list { padding: 12px 20px; }
+        .hours-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.88rem;
+        }
+        .hours-row:last-child { border-bottom: none; }
+        .hours-row .day { font-weight: 600; color: var(--text); }
+        .hours-row .time { color: var(--text-mid); }
+        .hours-row .time.today { color: var(--green); font-weight: 700; }
+
+        /* === DESKTOP === */
+        @media (min-width: 1024px) {
+            .view { padding-bottom: 0; }
+            .bottom-nav { display: none; }
+            #view-dashboard { display: grid; grid-template-columns: 1fr 400px; gap: 0; }
+            #view-dashboard.active { display: grid; }
+            .dash-left { overflow-y: auto; }
+            .dash-right { border-left: 1px solid var(--border); overflow-y: auto; }
+        }
+        @media (min-width: 768px) {
+            .orders-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="app-header">
+    <div class="brand">
+        <div class="brand-icon"><i class="fa fa-store"></i></div>
+        <div class="brand-text">
+            <h1>Merchant Dashboard</h1>
+            <span>ChopChop by Choppies</span>
+        </div>
+    </div>
+    <div class="store-toggle" id="storeToggle" onclick="merchant.toggleStore()">
+        <div class="store-dot" id="storeDot"></div>
+        <span id="storeStatus">Open</span>
+    </div>
+</header>
+
+<!-- ============================================================ -->
+<!-- VIEW: DASHBOARD -->
+<!-- ============================================================ -->
+<div class="view active" id="view-dashboard">
+    <!-- KPI Hero -->
+    <div class="dash-hero">
+        <div class="dash-welcome">Good afternoon, Store Manager</div>
+        <div class="dash-store">Choppies Game City</div>
+        <div class="dash-kpi-row">
+            <div class="kpi-box">
+                <div class="kval" id="kpi-orders">14</div>
+                <div class="klbl">Today's Orders</div>
+                <div class="kdiff">↑ 3 vs yesterday</div>
+            </div>
+            <div class="kpi-box">
+                <div class="kval">BWP 2,480</div>
+                <div class="klbl">Revenue</div>
+                <div class="kdiff">↑ 12%</div>
+            </div>
+            <div class="kpi-box">
+                <div class="kval">32min</div>
+                <div class="klbl">Avg Prep Time</div>
+                <div class="kdiff">↓ 4 min</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert -->
+    <div class="alert-banner">
+        <i class="fa fa-triangle-exclamation"></i>
+        <span>3 new orders are waiting for acceptance</span>
+    </div>
+
+    <!-- Quick Actions -->
+    <div style="padding: 16px; display: flex; gap: 10px;">
+        <button class="btn btn-red btn-block" onclick="merchant.navigate('orders')">
+            <i class="fa fa-bell"></i> View All Orders
+        </button>
+        <button class="btn btn-outline" onclick="merchant.navigate('products')">
+            <i class="fa fa-box"></i> Products
+        </button>
+    </div>
+
+    <!-- Recent Orders Preview -->
+    <div class="section-label">Recent Orders</div>
+    <div style="padding: 0 16px; display: flex; flex-direction: column; gap: 10px; padding-bottom: 16px;">
+
+        <div class="order-item new-order" onclick="merchant.openOrder('CHOP-3821', 'new')">
+            <div class="order-item-header">
+                <span class="order-item-title">#CHOP-3821</span>
+                <span class="chip new">New Order</span>
+            </div>
+            <div class="order-item-meta">
+                <span class="meta-pill"><i class="fa fa-clock"></i> 2 min ago</span>
+                <span class="meta-pill"><i class="fa fa-box"></i> 6 items</span>
+                <span class="meta-pill"><i class="fa fa-wallet"></i> BWP 142.50</span>
+            </div>
+            <div class="order-item-actions">
+                <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); merchant.rejectOrder(this)">Reject</button>
+                <button class="btn btn-green btn-sm" onclick="event.stopPropagation(); merchant.acceptNewOrder(this, 'CHOP-3821')">Accept Order</button>
+            </div>
+        </div>
+
+        <div class="order-item preparing" onclick="merchant.openOrder('CHOP-3819', 'preparing')">
+            <div class="order-item-header">
+                <span class="order-item-title">#CHOP-3819</span>
+                <span class="chip preparing">Preparing</span>
+            </div>
+            <div class="order-item-meta">
+                <span class="meta-pill"><i class="fa fa-clock"></i> 12 min ago</span>
+                <span class="meta-pill"><i class="fa fa-box"></i> 3 items</span>
+                <span class="meta-pill"><i class="fa fa-wallet"></i> BWP 68.00</span>
+            </div>
+            <div class="order-item-actions">
+                <button class="btn btn-green btn-sm" onclick="event.stopPropagation(); merchant.markReady(this)">Mark as Ready</button>
+            </div>
+        </div>
+
+        <div class="order-item ready" onclick="merchant.openOrder('CHOP-3815', 'ready')">
+            <div class="order-item-header">
+                <span class="order-item-title">#CHOP-3815</span>
+                <span class="chip ready">Ready for Pickup</span>
+            </div>
+            <div class="order-item-meta">
+                <span class="meta-pill"><i class="fa fa-clock"></i> 20 min ago</span>
+                <span class="meta-pill"><i class="fa fa-motorcycle"></i> Driver en route</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- VIEW: ORDERS -->
+<!-- ============================================================ -->
+<div class="view" id="view-orders">
+    <div class="order-filters">
+        <button class="filter-btn active">All (14)</button>
+        <button class="filter-btn" style="color:var(--blue); font-weight:700;">New (3)</button>
+        <button class="filter-btn">Preparing (4)</button>
+        <button class="filter-btn">Ready (2)</button>
+        <button class="filter-btn">Completed (5)</button>
+    </div>
+
+    <div class="orders-list">
+
+        <div class="order-item new-order" onclick="merchant.openOrder('CHOP-3821','new')">
+            <div class="order-item-header">
+                <span class="order-item-title">#CHOP-3821</span>
+                <span class="chip new">New</span>
+            </div>
+            <div class="order-item-meta">
+                <span class="meta-pill"><i class="fa fa-clock"></i> 2 min</span>
+                <span class="meta-pill"><i class="fa fa-box"></i> 6 items</span>
+                <span class="meta-pill"><i class="fa fa-wallet"></i> BWP 142.50</span>
+            </div>
+            <div class="order-item-actions">
+                <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); merchant.rejectOrder(this)">Reject</button>
+                <button class="btn btn-green btn-sm" onclick="event.stopPropagation(); merchant.acceptNewOrder(this, 'CHOP-3821')">Accept</button>
+            </div>
+        </div>
+
+        <div class="order-item new-order" onclick="merchant.openOrder('CHOP-3820','new')">
+            <div class="order-item-header">
+                <span class="order-item-title">#CHOP-3820</span>
+                <span class="chip new">New</span>
+            </div>
+            <div class="order-item-meta">
+                <span class="meta-pill"><i class="fa fa-clock"></i> 4 min</span>
+                <span class="meta-pill"><i class="fa fa-box"></i> 2 items</span>
+                <span class="meta-pill"><i class="fa fa-wallet"></i> BWP 49.00</span>
+            </div>
+            <div class="order-item-actions">
+                <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); merchant.rejectOrder(this)">Reject</button>
+                <button class="btn btn-green btn-sm" onclick="event.stopPropagation(); merchant.acceptNewOrder(this,'CHOP-3820')">Accept</button>
+            </div>
+        </div>
+
+        <div class="order-item new-order" onclick="merchant.openOrder('CHOP-3818','new')">
+            <div class="order-item-header">
+                <span class="order-item-title">#CHOP-3818</span>
+                <span class="chip new">New</span>
+            </div>
+            <div class="order-item-meta">
+                <span class="meta-pill"><i class="fa fa-clock"></i> 7 min</span>
+                <span class="meta-pill"><i class="fa fa-box"></i> 8 items</span>
+                <span class="meta-pill"><i class="fa fa-wallet"></i> BWP 210.00</span>
+            </div>
+            <div class="order-item-actions">
+                <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); merchant.rejectOrder(this)">Reject</button>
+                <button class="btn btn-green btn-sm" onclick="event.stopPropagation(); merchant.acceptNewOrder(this,'CHOP-3818')">Accept</button>
+            </div>
+        </div>
+
+        <div class="order-item preparing" onclick="merchant.openOrder('CHOP-3819','preparing')">
+            <div class="order-item-header">
+                <span class="order-item-title">#CHOP-3819</span>
+                <span class="chip preparing">Preparing</span>
+            </div>
+            <div class="order-item-meta">
+                <span class="meta-pill"><i class="fa fa-clock"></i> 12 min</span>
+                <span class="meta-pill"><i class="fa fa-box"></i> 3 items</span>
+            </div>
+            <div class="order-item-actions">
+                <button class="btn btn-green btn-sm" onclick="event.stopPropagation(); merchant.markReady(this)">Mark Ready</button>
+            </div>
+        </div>
+
+        <div class="order-item ready">
+            <div class="order-item-header">
+                <span class="order-item-title">#CHOP-3815</span>
+                <span class="chip ready">Ready</span>
+            </div>
+            <div class="order-item-meta">
+                <span class="meta-pill"><i class="fa fa-motorcycle"></i> Driver en route</span>
+            </div>
+        </div>
+
+        <div class="order-item completed">
+            <div class="order-item-header">
+                <span class="order-item-title">#CHOP-3810</span>
+                <span class="chip completed">Completed</span>
+            </div>
+            <div class="order-item-meta">
+                <span class="meta-pill"><i class="fa fa-clock"></i> 1h ago</span>
+                <span class="meta-pill"><i class="fa fa-wallet"></i> BWP 89.50</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- VIEW: ORDER DETAIL -->
+<!-- ============================================================ -->
+<div class="view" id="view-order-detail">
+    <div class="page-top">
+        <button class="back-btn" onclick="merchant.goBack()"><i class="fa fa-arrow-left"></i></button>
+        <h2 id="detail-order-id">Order #CHOP-3821</h2>
+        <span class="chip new" id="detail-chip">New</span>
+    </div>
+
+    <div class="order-detail-header">
+        <div class="order-detail-id" id="detail-id-big">#CHOP-3821</div>
+        <div class="order-detail-time">Placed 14:32 · Customer: Keabetswe Modise</div>
+        <!-- Status Flow -->
+        <div class="status-flow">
+            <div class="status-node done" id="snode-accepted">
+                <div class="dot"><i class="fa fa-check"></i></div>
+                <div class="node-label">Accepted</div>
+            </div>
+            <div class="status-connector done" id="scon-1"></div>
+            <div class="status-node active" id="snode-preparing">
+                <div class="dot"><i class="fa fa-fire-burner"></i></div>
+                <div class="node-label">Preparing</div>
+            </div>
+            <div class="status-connector" id="scon-2"></div>
+            <div class="status-node" id="snode-ready">
+                <div class="dot"><i class="fa fa-box"></i></div>
+                <div class="node-label">Ready</div>
+            </div>
+            <div class="status-connector" id="scon-3"></div>
+            <div class="status-node" id="snode-collected">
+                <div class="dot"><i class="fa fa-motorcycle"></i></div>
+                <div class="node-label">Collected</div>
+            </div>
+            <div class="status-connector" id="scon-4"></div>
+            <div class="status-node" id="snode-delivered">
+                <div class="dot"><i class="fa fa-house"></i></div>
+                <div class="node-label">Delivered</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer -->
+    <div class="customer-card card" style="margin: 16px; border-radius: var(--radius);">
+        <div class="cust-avatar"><i class="fa fa-user"></i></div>
+        <div class="cust-info">
+            <h4>Keabetswe Modise</h4>
+            <p><i class="fa fa-location-dot"></i> Phakalane Estate, Plot 12</p>
+        </div>
+        <button class="btn btn-outline btn-sm cust-action"><i class="fa fa-phone"></i></button>
+    </div>
+
+    <!-- Items -->
+    <div class="section-label">Order Items</div>
+    <div class="card" style="margin: 0 16px 16px;">
+        <div class="order-items-list">
+            <div class="order-item-row">
+                <div class="item-img">🍶</div>
+                <div class="item-detail">
+                    <div class="item-name">Excella 4L Cooking Oil</div>
+                    <div class="item-qty">Qty: 1</div>
+                </div>
+                <div class="item-price">BWP 132.99</div>
+            </div>
+            <div class="order-item-row">
+                <div class="item-img">🥣</div>
+                <div class="item-detail">
+                    <div class="item-name">Bokomo Weetbix 450G</div>
+                    <div class="item-qty">Qty: 2</div>
+                </div>
+                <div class="item-price">BWP 53.98</div>
+            </div>
+            <div class="order-item-row">
+                <div class="item-img">🥤</div>
+                <div class="item-detail">
+                    <div class="item-name">Coca Cola 2L</div>
+                    <div class="item-qty">Qty: 3</div>
+                </div>
+                <div class="item-price">BWP 65.97</div>
+            </div>
+        </div>
+        <div class="order-total-row">
+            <div class="total-line"><span>Subtotal</span><span>BWP 252.94</span></div>
+            <div class="total-line"><span>Delivery fee</span><span>BWP 15.00</span></div>
+            <div class="total-line grand"><span>Total Paid</span><span>BWP 267.94</span></div>
+        </div>
+    </div>
+
+    <div class="status-action-bar">
+        <button class="btn btn-outline btn-sm" onclick="merchant.goBack()">Back</button>
+        <button class="btn btn-green btn-block btn-lg" id="detail-cta" onclick="merchant.advanceDetailStatus()">
+            <i class="fa fa-fire-burner"></i> <span id="detail-cta-text">Mark as Preparing</span>
+        </button>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- VIEW: PRODUCTS -->
+<!-- ============================================================ -->
+<div class="view" id="view-products">
+    <div class="product-search">
+        <div class="search-input">
+            <i class="fa fa-search"></i>
+            <input type="text" placeholder="Search products..." oninput="merchant.searchProducts(this.value)">
+        </div>
+    </div>
+
+    <div id="products-container">
+        <!-- Beverages Section -->
+        <div class="product-section-header">
+            <h3>Beverages</h3>
+            <span>25 items</span>
+        </div>
+        <div style="background: var(--white); border-radius: 0; box-shadow: none;">
+            <div class="product-row" data-name="Coca Cola 2L">
+                <div class="prod-img">
+                    <img src="https://0e9888e15ff120042f30-8afe6499593a0c0cd36f211a1ceb9ca5.ssl.cf1.rackcdn.com//38906.png" alt="">
+                </div>
+                <div class="prod-info">
+                    <div class="prod-name">Coca Cola 2L</div>
+                    <div class="prod-cat">Beverages</div>
+                </div>
+                <div class="prod-price">BWP 21.99</div>
+                <div class="toggle-switch on" onclick="merchant.toggleProduct(this)"></div>
+            </div>
+            <div class="product-row" data-name="Red Bull 250ml Energy Drink">
+                <div class="prod-img">
+                    <img src="https://0e9888e15ff120042f30-8afe6499593a0c0cd36f211a1ceb9ca5.ssl.cf1.rackcdn.com//47619.png" alt="">
+                </div>
+                <div class="prod-info">
+                    <div class="prod-name">Red Bull 250ml Energy Drink</div>
+                    <div class="prod-cat">Beverages</div>
+                </div>
+                <div class="prod-price">BWP 10.99</div>
+                <div class="toggle-switch on" onclick="merchant.toggleProduct(this)"></div>
+            </div>
+            <div class="product-row" data-name="Choppies 250G Coffee Granules">
+                <div class="prod-img">
+                    <img src="https://33f9249e419a09a17aed-a5a2dfd1fb4a4b44fd0aa73478edad3b.ssl.cf1.rackcdn.com//44017.jpg" alt="">
+                </div>
+                <div class="prod-info">
+                    <div class="prod-name">Choppies 250G Coffee Granules</div>
+                    <div class="prod-cat">Beverages</div>
+                </div>
+                <div class="prod-price">BWP 39.99</div>
+                <div class="toggle-switch" onclick="merchant.toggleProduct(this)"></div>
+            </div>
+        </div>
+
+        <!-- Edible Groceries Section -->
+        <div class="product-section-header" style="margin-top: 8px;">
+            <h3>Edible Groceries</h3>
+            <span>19 items</span>
+        </div>
+        <div style="background: var(--white);">
+            <div class="product-row" data-name="Excella 4L Cooking Oil">
+                <div class="prod-img">
+                    <img src="https://33f9249e419a09a17aed-a5a2dfd1fb4a4b44fd0aa73478edad3b.ssl.cf1.rackcdn.com//48475.jpg" alt="">
+                </div>
+                <div class="prod-info">
+                    <div class="prod-name">Excella 4L Cooking Oil</div>
+                    <div class="prod-cat">Edible Groceries</div>
+                </div>
+                <div class="prod-price">BWP 132.99</div>
+                <div class="toggle-switch on" onclick="merchant.toggleProduct(this)"></div>
+            </div>
+            <div class="product-row" data-name="Super A1 10KG Maize Meal">
+                <div class="prod-img">
+                    <img src="https://33f9249e419a09a17aed-a5a2dfd1fb4a4b44fd0aa73478edad3b.ssl.cf1.rackcdn.com//48698.jpg" alt="">
+                </div>
+                <div class="prod-info">
+                    <div class="prod-name">Super A1 10KG Maize Meal</div>
+                    <div class="prod-cat">Edible Groceries</div>
+                </div>
+                <div class="prod-price">BWP 89.99</div>
+                <div class="toggle-switch on" onclick="merchant.toggleProduct(this)"></div>
+            </div>
+            <div class="product-row" data-name="Bokomo Weetbix 450G">
+                <div class="prod-img">
+                    <img src="https://33f9249e419a09a17aed-a5a2dfd1fb4a4b44fd0aa73478edad3b.ssl.cf1.rackcdn.com//39465.png" alt="">
+                </div>
+                <div class="prod-info">
+                    <div class="prod-name">Bokomo Weetbix 450G</div>
+                    <div class="prod-cat">Edible Groceries</div>
+                </div>
+                <div class="prod-price">BWP 26.99</div>
+                <div class="toggle-switch on" onclick="merchant.toggleProduct(this)"></div>
+            </div>
+        </div>
+
+        <!-- Household Section -->
+        <div class="product-section-header" style="margin-top: 8px;">
+            <h3>Household</h3>
+            <span>5 items</span>
+        </div>
+        <div style="background: var(--white);">
+            <div class="product-row" data-name="OMO 2KG Washing Powder Auto Hygiene">
+                <div class="prod-img">
+                    <img src="https://33f9249e419a09a17aed-a5a2dfd1fb4a4b44fd0aa73478edad3b.ssl.cf1.rackcdn.com//40336.jpg" alt="">
+                </div>
+                <div class="prod-info">
+                    <div class="prod-name">OMO 2KG Washing Powder</div>
+                    <div class="prod-cat">Household</div>
+                </div>
+                <div class="prod-price">BWP 89.99</div>
+                <div class="toggle-switch on" onclick="merchant.toggleProduct(this)"></div>
+            </div>
+            <div class="product-row" data-name="Snowsoft 18S Luxury 2Ply">
+                <div class="prod-img">
+                    <img src="https://33f9249e419a09a17aed-a5a2dfd1fb4a4b44fd0aa73478edad3b.ssl.cf1.rackcdn.com//44442.jpg" alt="">
+                </div>
+                <div class="prod-info">
+                    <div class="prod-name">Snowsoft 18S Luxury 2Ply</div>
+                    <div class="prod-cat">Household</div>
+                </div>
+                <div class="prod-price">BWP 101.99</div>
+                <div class="toggle-switch" onclick="merchant.toggleProduct(this)"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- VIEW: SETTINGS -->
+<!-- ============================================================ -->
+<div class="view" id="view-settings">
+    <div class="settings-hero">
+        <div class="store-logo-circle"><i class="fa fa-store"></i></div>
+        <h2>Choppies Game City</h2>
+        <p>Gaborone · Store ID: CGC-001</p>
+    </div>
+
+    <!-- Availability Card -->
+    <div class="availability-card" id="availCard">
+        <div class="avail-header" id="availHeader">
+            <div>
+                <h3>Store is Open</h3>
+                <div class="avail-status">Accepting orders now</div>
+            </div>
+            <button class="avail-toggle-btn" onclick="merchant.toggleAvailability()">Close Store</button>
+        </div>
+        <div class="hours-list">
+            <div class="hours-row"><span class="day">Monday</span><span class="time">07:00 – 20:00</span></div>
+            <div class="hours-row"><span class="day">Tuesday</span><span class="time">07:00 – 20:00</span></div>
+            <div class="hours-row"><span class="day">Wednesday</span><span class="time">07:00 – 20:00</span></div>
+            <div class="hours-row"><span class="day">Thursday</span><span class="time">07:00 – 20:00</span></div>
+            <div class="hours-row"><span class="day">Friday</span><span class="time">07:00 – 21:00</span></div>
+            <div class="hours-row"><span class="day">Saturday</span><span class="time">07:00 – 19:00</span></div>
+            <div class="hours-row"><span class="day">Sunday — Today</span><span class="time today">08:00 – 18:00 · Open now</span></div>
+        </div>
+    </div>
+
+    <!-- Settings Menu -->
+    <div class="settings-section" style="margin-top: 16px;">
+        <div style="background: var(--white); border-radius: var(--radius); margin: 0 16px; box-shadow: var(--shadow); overflow: hidden;">
+            <div class="setting-row">
+                <div class="set-icon green"><i class="fa fa-bell"></i></div>
+                <div class="set-text"><h4>Notifications</h4><p>Order alerts and push notifications</p></div>
+                <div class="set-right">On</div>
+            </div>
+            <div class="divider"></div>
+            <div class="setting-row">
+                <div class="set-icon blue"><i class="fa fa-clock"></i></div>
+                <div class="set-text"><h4>Preparation Time</h4><p>Set default order prep time</p></div>
+                <div class="set-right">30 min</div>
+            </div>
+            <div class="divider"></div>
+            <div class="setting-row">
+                <div class="set-icon orange"><i class="fa fa-chart-bar"></i></div>
+                <div class="set-text"><h4>Sales Reports</h4><p>View detailed revenue analytics</p></div>
+                <i class="fa fa-chevron-right set-right"></i>
+            </div>
+            <div class="divider"></div>
+            <div class="setting-row">
+                <div class="set-icon"><i class="fa fa-headset"></i></div>
+                <div class="set-text"><h4>Merchant Support</h4><p>Get help from ChopChop team</p></div>
+                <i class="fa fa-chevron-right set-right"></i>
+            </div>
+            <div class="divider"></div>
+            <div class="setting-row" onclick="window.location.href='/site/'">
+                <div class="set-icon" style="background:var(--red-light); color:var(--red);"><i class="fa fa-right-from-bracket"></i></div>
+                <div class="set-text"><h4>Switch Role</h4><p>Return to platform gateway</p></div>
+                <i class="fa fa-chevron-right set-right"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+    <button class="nav-tab active" onclick="merchant.navigate('dashboard')" data-view="dashboard">
+        <i class="fa fa-grid-2"></i>
+        <span>Dashboard</span>
+    </button>
+    <button class="nav-tab" onclick="merchant.navigate('orders')" data-view="orders" style="position:relative;">
+        <i class="fa fa-receipt"></i>
+        <span>Orders</span>
+        <div class="nav-badge">3</div>
+    </button>
+    <button class="nav-tab" onclick="merchant.navigate('products')" data-view="products">
+        <i class="fa fa-box-open"></i>
+        <span>Products</span>
+    </button>
+    <button class="nav-tab" onclick="merchant.navigate('settings')" data-view="settings">
+        <i class="fa fa-gear"></i>
+        <span>Settings</span>
+    </button>
+</nav>
+
+<script>
+    const merchant = {
+        state: {
+            storeOpen: true,
+            previousView: 'dashboard',
+            detailStep: 0
+        },
+
+        navigate(viewId) {
+            if (viewId !== 'order-detail') this.state.previousView = viewId;
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById('view-' + viewId).classList.add('active');
+            document.querySelectorAll('.nav-tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.view === viewId);
+            });
+            window.scrollTo(0, 0);
+        },
+
+        goBack() {
+            this.navigate(this.state.previousView);
+        },
+
+        toggleStore() {
+            this.state.storeOpen = !this.state.storeOpen;
+            const dot = document.getElementById('storeDot');
+            const status = document.getElementById('storeStatus');
+            if (this.state.storeOpen) {
+                dot.classList.remove('closed');
+                status.textContent = 'Open';
+            } else {
+                dot.classList.add('closed');
+                status.textContent = 'Closed';
+            }
+        },
+
+        toggleAvailability() {
+            this.state.storeOpen = !this.state.storeOpen;
+            const header = document.getElementById('availHeader');
+            const btn = header.querySelector('.avail-toggle-btn');
+            if (this.state.storeOpen) {
+                header.classList.remove('closed');
+                header.querySelector('h3').textContent = 'Store is Open';
+                header.querySelector('.avail-status').textContent = 'Accepting orders now';
+                btn.textContent = 'Close Store';
+            } else {
+                header.classList.add('closed');
+                header.querySelector('h3').textContent = 'Store is Closed';
+                header.querySelector('.avail-status').textContent = 'Not accepting orders';
+                btn.textContent = 'Open Store';
+            }
+            // Sync header toggle
+            const dot = document.getElementById('storeDot');
+            const stStatus = document.getElementById('storeStatus');
+            if (this.state.storeOpen) {
+                dot.classList.remove('closed');
+                stStatus.textContent = 'Open';
+            } else {
+                dot.classList.add('closed');
+                stStatus.textContent = 'Closed';
+            }
+        },
+
+        openOrder(id, status) {
+            this.state.detailStep = status === 'new' ? 0 : status === 'preparing' ? 1 : 2;
+            document.getElementById('detail-order-id').textContent = 'Order #' + id;
+            document.getElementById('detail-id-big').textContent = '#' + id;
+
+            const chipEl = document.getElementById('detail-chip');
+            const ctaEl = document.getElementById('detail-cta');
+            const ctaText = document.getElementById('detail-cta-text');
+            const ctaIcon = ctaEl.querySelector('i');
+
+            // Reset status nodes
+            ['accepted','preparing','ready','collected','delivered'].forEach((s, i) => {
+                document.getElementById('snode-' + s).className = 'status-node';
+            });
+            [1,2,3,4].forEach(i => {
+                document.getElementById('scon-' + i).className = 'status-connector';
+            });
+
+            if (status === 'new') {
+                chipEl.className = 'chip new'; chipEl.textContent = 'New Order';
+                ctaText.textContent = 'Accept & Start Preparing';
+                ctaIcon.className = 'fa fa-check';
+                ctaEl.className = 'btn btn-green btn-block btn-lg';
+                document.getElementById('snode-accepted').className = 'status-node active';
+            } else if (status === 'preparing') {
+                chipEl.className = 'chip preparing'; chipEl.textContent = 'Preparing';
+                ctaText.textContent = 'Mark as Ready for Pickup';
+                ctaIcon.className = 'fa fa-box';
+                ctaEl.className = 'btn btn-blue btn-block btn-lg';
+                document.getElementById('snode-accepted').className = 'status-node done';
+                document.getElementById('scon-1').className = 'status-connector done';
+                document.getElementById('snode-preparing').className = 'status-node active';
+            } else if (status === 'ready') {
+                chipEl.className = 'chip ready'; chipEl.textContent = 'Ready';
+                ctaText.textContent = 'Awaiting Driver Pickup';
+                ctaEl.className = 'btn btn-outline btn-block btn-lg';
+                ctaEl.disabled = true;
+                document.getElementById('snode-accepted').className = 'status-node done';
+                document.getElementById('scon-1').className = 'status-connector done';
+                document.getElementById('snode-preparing').className = 'status-node done';
+                document.getElementById('scon-2').className = 'status-connector done';
+                document.getElementById('snode-ready').className = 'status-node active';
+            }
+
+            this.navigate('order-detail');
+        },
+
+        advanceDetailStatus() {
+            this.state.detailStep++;
+            if (this.state.detailStep === 1) {
+                // Accepted → Preparing
+                document.getElementById('snode-accepted').className = 'status-node done';
+                document.getElementById('scon-1').className = 'status-connector done';
+                document.getElementById('snode-preparing').className = 'status-node active';
+                document.getElementById('detail-chip').className = 'chip preparing';
+                document.getElementById('detail-chip').textContent = 'Preparing';
+                document.getElementById('detail-cta-text').textContent = 'Mark as Ready for Pickup';
+                document.getElementById('detail-cta').querySelector('i').className = 'fa fa-box';
+                document.getElementById('detail-cta').className = 'btn btn-blue btn-block btn-lg';
+            } else if (this.state.detailStep === 2) {
+                // Preparing → Ready
+                document.getElementById('snode-preparing').className = 'status-node done';
+                document.getElementById('scon-2').className = 'status-connector done';
+                document.getElementById('snode-ready').className = 'status-node active';
+                document.getElementById('detail-chip').className = 'chip ready';
+                document.getElementById('detail-chip').textContent = 'Ready';
+                document.getElementById('detail-cta-text').textContent = 'Awaiting Driver Pickup';
+                document.getElementById('detail-cta').querySelector('i').className = 'fa fa-motorcycle';
+                document.getElementById('detail-cta').className = 'btn btn-outline btn-block btn-lg';
+                document.getElementById('detail-cta').disabled = true;
+            }
+        },
+
+        acceptNewOrder(btn, id) {
+            const card = btn.closest('.order-item');
+            card.classList.remove('new-order');
+            card.classList.add('preparing');
+            card.querySelector('.chip').className = 'chip preparing';
+            card.querySelector('.chip').textContent = 'Preparing';
+            const actions = card.querySelector('.order-item-actions');
+            actions.innerHTML = '<button class="btn btn-green btn-sm" onclick="event.stopPropagation(); merchant.markReady(this)">Mark Ready</button>';
+            // Update badge
+            const badge = document.querySelector('.nav-badge');
+            if (badge) {
+                const count = parseInt(badge.textContent) - 1;
+                if (count > 0) badge.textContent = count;
+                else badge.style.display = 'none';
+            }
+        },
+
+        markReady(btn) {
+            const card = btn.closest('.order-item');
+            card.classList.remove('preparing');
+            card.classList.add('ready');
+            card.querySelector('.chip').className = 'chip ready';
+            card.querySelector('.chip').textContent = 'Ready';
+            card.querySelector('.order-item-actions').innerHTML = '<span style="font-size:0.8rem; color:var(--text-mid); display:flex; align-items:center; gap:6px;"><i class="fa fa-motorcycle"></i> Awaiting driver pickup</span>';
+        },
+
+        rejectOrder(btn) {
+            const card = btn.closest('.order-item');
+            card.style.transition = 'opacity 0.3s, transform 0.3s';
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.95)';
+            setTimeout(() => card.remove(), 300);
+        },
+
+        toggleProduct(toggle) {
+            toggle.classList.toggle('on');
+        },
+
+        searchProducts(query) {
+            const rows = document.querySelectorAll('.product-row');
+            rows.forEach(row => {
+                const name = row.dataset.name.toLowerCase();
+                row.style.display = name.includes(query.toLowerCase()) ? '' : 'none';
+            });
+        }
+    };
+</script>
+</body>
+</html>
