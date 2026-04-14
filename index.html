@@ -65,26 +65,46 @@
             <!-- Home Screen -->
             <section id="home-screen" class="view">
                 <!-- Mobile Header -->
-                <div class="mobile-header mobile-only">
+                <div class="mobile-header mobile-only" style="padding-bottom: 8px;">
                     <div class="mobile-header-top">
-                        <div class="logo"><img src="assets/logo.png" alt="ChopChop by Choppies" style="height: 35px;"></div>
+                        <div class="delivery-location-header">
+                            <span class="delivery-location-label">Delivering To <span class="header-badge-rewards">REWARDS PLUS</span></span>
+                            <span class="delivery-location-value">Plot 12345, Gaborone <i class="fa fa-chevron-down"></i></span>
+                        </div>
                         <div class="delivery-time">
-                            <i class="fa fa-bolt"></i> 45-60 min
+                            <i class="fa fa-bolt"></i> 45 min
                         </div>
                     </div>
                     <div class="search-bar">
                         <i class="fa fa-search"></i>
-                        <input type="text" placeholder="Search groceries, meals...">
+                        <input type="text" placeholder="Groceries, meals, drinks...">
+                    </div>
+                    <!-- Quick Filters (Pills) -->
+                    <div class="filter-pills-container">
+                        <div class="filter-pill active"><i class="fa fa-sort"></i> For You</div>
+                        <div class="filter-pill special"><i class="fa fa-tag"></i> Offers</div>
+                        <div class="filter-pill"><i class="fa fa-leaf"></i> Fresh Produce</div>
+                        <div class="filter-pill"><i class="fa fa-clock"></i> Under 30 Min</div>
+                        <div class="filter-pill">Top Rated</div>
                     </div>
                 </div>
 
                 <div class="container section-padding">
+                    <!-- Advert on top -->
+                    <div class="main-advert-banner mt-4" style="background-image: linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 100%), url('images/choppies_store_banner.jpg');">
+                        <div class="advert-content">
+                            <h3>Lightning Delivery</h3>
+                            <p>Get your groceries under 30 mins</p>
+                            <button class="btn btn-outline" onclick="app.navigate('categories')">Order Now</button>
+                        </div>
+                    </div>
+
                     <!-- Promo Banner -->
-                    <div class="promo-banner">
+                    <div class="promo-banner mt-4" style="background-image: linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%), url('images/fresh_produce_banner.png');">
                         <div class="promo-content">
                             <h2>Weekend Deals!</h2>
                             <p>Up to 50% off on fresh produce</p>
-                            <button class="btn btn-red" onclick="app.navigate('categories')">Shop Now</button>
+                            <button class="btn btn-primary" onclick="app.navigate('categories')">Shop Now</button>
                         </div>
                     </div>
 
@@ -97,11 +117,11 @@
                         <!-- Populated by JS -->
                     </div>
 
-                    <!-- Weekly Specials -->
+                    <!-- Weekly Specials (Carousel) -->
                     <div class="section-title">
-                        <h3>Weekly Specials</h3>
+                        <h3>Today's Highlights</h3>
                     </div>
-                    <div class="product-grid" id="home-specials-grid">
+                    <div class="product-carousel" id="home-specials-grid">
                         <!-- Populated by JS -->
                     </div>
 
@@ -111,6 +131,25 @@
                     </div>
                     <div class="product-grid" id="home-popular-grid">
                         <!-- Populated by JS -->
+                    </div>
+
+                    <!-- More to Explore (Themed Banners) -->
+                    <div class="section-title mt-4">
+                        <h3>More to explore</h3>
+                    </div>
+                    <div class="themed-banners">
+                        <div class="theme-banner" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=400&q=80');">
+                            <div class="theme-banner-content">
+                                <h4>Pantry Staples</h4>
+                                <span>Stock up and save</span>
+                            </div>
+                        </div>
+                        <div class="theme-banner" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1550583724-b26cc28df5d1?auto=format&fit=crop&w=400&q=80');">
+                            <div class="theme-banner-content">
+                                <h4>Freshly Baked</h4>
+                                <span>Straight from the oven</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -274,6 +313,181 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Orders Screen -->
+            <section id="orders-screen" class="view">
+                <div class="page-header desktop-header-align">
+                    <h2>My Orders</h2>
+                </div>
+                <div class="container section-padding">
+                    <div class="orders-list">
+                        <!-- Example Order -->
+                        <div class="order-card">
+                            <div class="order-card-header">
+                                <div class="order-status-badge active"><i class="fa fa-motorcycle"></i> In Transit</div>
+                                <span class="order-date">Today, 2:45 PM</span>
+                            </div>
+                            <div class="order-card-body">
+                                <h3>Order #CHOP-8921</h3>
+                                <p>5 Items • P 280.50</p>
+                            </div>
+                            <div class="order-card-footer">
+                                <button class="btn btn-secondary btn-sm" onclick="app.navigate('tracking')">Track Order</button>
+                            </div>
+                        </div>
+
+                        <!-- Example Past Order -->
+                        <div class="order-card">
+                            <div class="order-card-header">
+                                <div class="order-status-badge delivered"><i class="fa fa-check-circle"></i> Delivered</div>
+                                <span class="order-date">Oct 12, 10:30 AM</span>
+                            </div>
+                            <div class="order-card-body">
+                                <h3>Order #CHOP-8802</h3>
+                                <p>12 Items • P 540.00</p>
+                            </div>
+                            <div class="order-card-footer">
+                                <button class="btn btn-secondary btn-sm">Reorder</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Screen -->
+            <section id="profile-screen" class="view">
+                <div class="page-header desktop-header-align">
+                    <h2>My Profile</h2>
+                </div>
+                <div class="container section-padding">
+                    <div class="profile-card">
+                        <div class="profile-header">
+                            <div class="profile-avatar"><i class="fa fa-user"></i></div>
+                            <div class="profile-info">
+                                <h3>John Doe</h3>
+                                <p>+267 71 234 567</p>
+                            </div>
+                        </div>
+                        <ul class="profile-menu">
+                            <li><a href="javascript:void(0)" onclick="app.navigate('profile-addresses')"><i class="fa fa-map-marker-alt"></i> Saved Addresses <i class="fa fa-chevron-right arrow"></i></a></li>
+                            <li><a href="javascript:void(0)" onclick="app.navigate('profile-payments')"><i class="fa fa-credit-card"></i> Payment Methods <i class="fa fa-chevron-right arrow"></i></a></li>
+                            <li><a href="javascript:void(0)" onclick="app.navigate('profile-notifications')"><i class="fa fa-bell"></i> Notifications <i class="fa fa-chevron-right arrow"></i></a></li>
+                            <li><a href="javascript:void(0)" onclick="app.navigate('profile-support')"><i class="fa fa-question-circle"></i> Help & Support <i class="fa fa-chevron-right arrow"></i></a></li>
+                        </ul>
+                        <button class="btn btn-red btn-block mt-4" onclick="app.showToast('Logged out successfully!'); app.navigate('home');"><i class="fa fa-sign-out-alt"></i> Logout</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile: Saved Addresses Screen -->
+            <section id="profile-addresses-screen" class="view">
+                <div class="page-header with-back">
+                    <button class="back-btn" onclick="app.goBack()"><i class="fa fa-chevron-left"></i></button>
+                    <h2>Saved Addresses</h2>
+                </div>
+                <div class="container section-padding">
+                    <div class="checkout-card mb-4" style="margin-bottom: 16px;">
+                        <h4 style="margin-bottom: 4px; display:flex; justify-content:space-between; align-items:center;">Home <span style="font-size:0.8rem; background:var(--color-primary-light); color:var(--color-primary); padding:2px 8px; border-radius:12px;">Default</span></h4>
+                        <p style="margin-bottom:0; font-size:0.9rem;">Plot 12345, Block 6<br>Gaborone, Botswana</p>
+                    </div>
+                    <div class="checkout-card mb-4" style="margin-bottom: 24px;">
+                        <h4 style="margin-bottom: 4px;">Office</h4>
+                        <p style="margin-bottom:0; font-size:0.9rem;">iTowers North, CBD<br>Gaborone, Botswana</p>
+                    </div>
+                    <button class="btn btn-primary btn-block"><i class="fa fa-plus"></i> Add New Address</button>
+                </div>
+            </section>
+
+            <!-- Profile: Payment Methods Screen -->
+            <section id="profile-payments-screen" class="view">
+                <div class="page-header with-back">
+                    <button class="back-btn" onclick="app.goBack()"><i class="fa fa-chevron-left"></i></button>
+                    <h2>Payment Methods</h2>
+                </div>
+                <div class="container section-padding">
+                    <div class="checkout-card mb-4" style="margin-bottom: 16px; display:flex; align-items:center; gap: 16px;">
+                        <i class="fab fa-cc-visa" style="font-size:2rem; color:#1434CB;"></i>
+                        <div style="flex:1;">
+                            <h4 style="margin-bottom: 2px;">Visa ending in 4242</h4>
+                            <p style="margin-bottom:0; font-size:0.8rem;">Expires 12/28</p>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary btn-block"><i class="fa fa-plus"></i> Add New Card</button>
+                </div>
+            </section>
+
+            <!-- Profile: Notifications Screen -->
+            <section id="profile-notifications-screen" class="view">
+                <div class="page-header with-back">
+                    <button class="back-btn" onclick="app.goBack()"><i class="fa fa-chevron-left"></i></button>
+                    <h2>Notifications</h2>
+                </div>
+                <div class="container section-padding">
+                    <div class="checkout-card" style="margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <h4 style="margin-bottom:2px;">Order Updates</h4>
+                            <p style="margin-bottom:0; font-size:0.85rem;">Push notifications</p>
+                        </div>
+                        <input type="checkbox" checked style="width:20px; height:20px;">
+                    </div>
+                    <div class="checkout-card" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <h4 style="margin-bottom:2px;">Promotions & Offers</h4>
+                            <p style="margin-bottom:0; font-size:0.85rem;">Emails and alerts</p>
+                        </div>
+                        <input type="checkbox" checked style="width:20px; height:20px;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile: Help & Support Screen -->
+            <section id="profile-support-screen" class="view">
+                <div class="page-header with-back">
+                    <button class="back-btn" onclick="app.goBack()"><i class="fa fa-chevron-left"></i></button>
+                    <h2>Help & Support</h2>
+                </div>
+                <div class="container section-padding">
+                    <div class="checkout-card" style="text-align:center; padding: 32px 20px;">
+                        <i class="fa fa-headset" style="font-size:3rem; color:var(--color-primary); margin-bottom:16px;"></i>
+                        <h3 style="margin-bottom:12px;">How can we help?</h3>
+                        <p>Our support team is available from 8 AM to 8 PM to assist with your orders.</p>
+                        <button class="btn btn-red btn-block mt-4" onclick="window.location.href='tel:+26771234567'"><i class="fa fa-phone"></i> Call Support</button>
+                        <button class="btn btn-secondary btn-block mt-4" style="margin-top: 12px;"><i class="fa fa-comment-dots"></i> Start Live Chat</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Global Footer (Shared across all views) -->
+            <footer class="app-footer">
+                <div class="footer-content">
+                    <div class="footer-brand">
+                        <h2>ChopChop <span>by Choppies</span></h2>
+                        <p>Premium grocery delivery in minutes. Fresh, fast, and packed with rewards.</p>
+                    </div>
+                    <div class="footer-links">
+                        <div class="link-column">
+                            <h4>Company</h4>
+                            <a href="#">About Us</a>
+                            <a href="#">Careers</a>
+                            <a href="#">Partners</a>
+                        </div>
+                        <div class="link-column">
+                            <h4>Support</h4>
+                            <a href="#">Help Center</a>
+                            <a href="#">Terms & Conditions</a>
+                            <a href="#">Privacy Policy</a>
+                        </div>
+                    </div>
+                    <div class="footer-social">
+                        <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    </div>
+                    <div class="footer-bottom">
+                        <p>&copy; 2026 Choppies Enterprises Limited. All rights reserved.</p>
+                    </div>
+                </div>
+            </footer>
         </main>
 
         <!-- Bottom Navigation (Mobile Only) -->

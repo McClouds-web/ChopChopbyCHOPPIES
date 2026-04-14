@@ -138,7 +138,8 @@ const state = {
     currentView: 'home',
     viewHistory: [],
     selectedCategory: null,
-    selectedProduct: null
+    selectedProduct: null,
+    isMember: true // Assume the user is a Choppies Rewards member for the premium UI!
 };
 
 // --- APP CONTROLLER ---
@@ -208,13 +209,38 @@ const app = {
             </div>
         `).join('');
 
-        const specials = db.products.filter(p => p.badge); // Specials have badges
-        const specialsGrid = document.getElementById('home-specials-grid');
-        specialsGrid.innerHTML = specials.map(p => this.createProductCard(p)).join('');
+        // Populate filter pills if container exists
+        const filterContainer = document.querySelector('.filter-pills-container');
+        if (filterContainer) {
+            const filters = [
+                { name: 'For You', icon: 'fa-sort', active: true },
+                { name: 'Offers', icon: 'fa-tag', special: true },
+                { name: 'Fresh Produce', icon: 'fa-leaf' },
+                { name: 'Under 30 Min', icon: 'fa-clock' },
+                { name: 'Top Rated', icon: 'fa-star' },
+                { name: 'Rewards Deals', icon: 'fa-certificate', special: true }
+            ];
+            filterContainer.innerHTML = filters.map(f => `
+                <div class="filter-pill ${f.active ? 'active' : ''} ${f.special ? 'special' : ''}" onclick="app.toggleFilter(this)">
+                    ${f.icon ? `<i class="fa ${f.icon}"></i>` : ''} ${f.name}
+                </div>
+            `).join('');
+        }
 
-        const popular = db.products.filter(p => p.popular);
+        const highlights = db.products.filter(p => p.badge || p.popular).slice(0, 6);
+        const highlightsCarousel = document.getElementById('home-specials-grid');
+        highlightsCarousel.innerHTML = highlights.map(p => this.createProductCard(p)).join('');
+
+        const popular = db.products.filter(p => !p.badge && !p.popular).slice(0, 8);
         const popularGrid = document.getElementById('home-popular-grid');
         popularGrid.innerHTML = popular.map(p => this.createProductCard(p)).join('');
+    },
+
+    toggleFilter(el) {
+        document.querySelectorAll('.filter-pill').forEach(pill => pill.classList.remove('active'));
+        el.classList.add('active');
+        // Visual feedback
+        this.showToast('Filtering for ' + el.innerText.trim());
     },
 
     renderCategories() {
@@ -295,13 +321,28 @@ const app = {
                     <img src="${product.image}" loading="lazy" alt="${product.name}">
                 </div>
                 <div class="product-info">
+                    <div class="product-meta-top">
+                        <span class="product-rating">
+                            <i class="fa fa-star"></i> ${product.rating || '4.5'} 
+                            <span class="product-reviews">(${product.reviews || '100+'})</span>
+                        </span>
+                        <span class="delivery-eta">${product.deliveryTime || '25-30 min'}</span>
+                    </div>
                     <div class="product-title">${product.name}</div>
                     <div class="product-desc-short">${product.desc}</div>
                     
                     <div class="product-price-row">
                         <div class="product-vals">
-                            <span class="product-price">BWP ${product.price.toFixed(2)}</span>
-                            ${product.oldPrice ? `<span class="old-price">BWP ${product.oldPrice.toFixed(2)}</span>` : ''}
+                            ${(product.memberPrice && state.isMember) ? `
+                                <div class="member-price-wrap">
+                                    <span class="member-label">REWARDS</span>
+                                    <span class="product-price member-price">BWP ${product.memberPrice.toFixed(2)}</span>
+                                </div>
+                                <span class="old-price strike">BWP ${product.price.toFixed(2)}</span>
+                            ` : `
+                                <span class="product-price">BWP ${product.price.toFixed(2)}</span>
+                                ${product.oldPrice ? `<span class="old-price">BWP ${product.oldPrice.toFixed(2)}</span>` : ''}
+                            `}
                         </div>
                     </div>
 
